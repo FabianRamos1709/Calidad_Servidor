@@ -18,10 +18,10 @@ def register():
 @auth_routes.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    token = authenticate_user(username, password)
+    token = authenticate_user(email, password)
     if token:
         return jsonify({'token': token}), 200
     return jsonify({'message': 'Invalid credentials'}), 401

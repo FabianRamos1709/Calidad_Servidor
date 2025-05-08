@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from app.config import Config
+from flask_migrate import Migrate
+from backend.config import Config
 from app.models import db
 from app.routes import auth_routes
 
@@ -11,14 +12,9 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     JWTManager(app)
+    Migrate(app, db)  # ⬅️ Esta línea es nueva
 
-    # Registrar rutas
     app.register_blueprint(auth_routes, url_prefix='/auth')
-
-    # Crear las tablas si no existen
-    with app.app_context():
-        db.create_all()
-
     return app
 
 if __name__ == '__main__':

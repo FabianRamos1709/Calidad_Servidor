@@ -3,7 +3,7 @@ from app.models import db, User
 from flask_jwt_extended import create_access_token
 
 def create_user(username, password, email):
-    existing_user = User.query.filter_by(username=username).first()
+    existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return None
 
@@ -14,8 +14,8 @@ def create_user(username, password, email):
     db.session.commit()
     return new_user
 
-def authenticate_user(username, password):
-    user = User.query.filter_by(username=username).first()
+def authenticate_user(email, password):
+    user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password_hash, password):
         token = create_access_token(identity=user.id)
         return token
