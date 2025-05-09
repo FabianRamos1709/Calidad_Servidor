@@ -16,7 +16,9 @@ def create_app():
 
     db.init_app(app)
     JWTManager(app)
-    Migrate(app, db)  
+    with app.app_context():
+        db.create_all() 
+    #Migrate(app, db)  
 
     app.register_blueprint(software_routes, url_prefix='/software')
     return app

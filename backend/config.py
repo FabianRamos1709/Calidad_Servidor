@@ -5,5 +5,5 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'your_jwt_secret_key'
     
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql://root:juanangel1709@localhost/calidad_servidor'  
+        'mysql://root:proyectoCalidadServidor@localhost/calidad_servidor'  
     SQLALCHEMY_TRACK_MODIFICATIONS = False

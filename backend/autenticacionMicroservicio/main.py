@@ -17,11 +17,13 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     JWTManager(app)
-    Migrate(app, db)  # ⬅️ Esta línea es nueva
+    with app.app_context():
+        db.create_all() 
+    #Migrate(app, db)  # ⬅️ Esta línea es nueva
 
     app.register_blueprint(auth_routes, url_prefix='/auth')
     return app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
