@@ -1,0 +1,133 @@
+/* Variables de colores */
+:root {
+    --primary-color: #0066cc;
+    --primary-dark: #004d99;
+    --background-light: #ffffff;
+    --text-light: #333333;
+    --text-secondary-light: #666666;
+    --input-background-light: #f5f5f5;
+    --input-border-light: #e0e0e0;
+    --input-text-light: #333333;
+    
+    /* Modo oscuro */
+    --background-dark: #1a1a1a;
+    --text-dark: #f0f0f0;
+    --text-secondary-dark: #b0b0b0;
+    --input-background-dark: #2a2a2a;
+    --input-border-dark: #444444;
+    --input-text-dark: #f0f0f0;
+  }
+  
+  /* Base */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  body.dark-theme {
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+  }
+  
+  /* Formulario general */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary-light);
+    text-align: left;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--input-border-light);
+    background-color: var(--input-background-light);
+    color: var(--input-text-light);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+  
+  .password-input-container {
+    position: relative;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary-light);
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .password-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.75rem;
+    margin-top: 8px;
+    list-style: none;
+    padding-left: 0;
+  }
+  .password-checklist li {
+    padding: 4px 6px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    color: #444;
+  }
+  .password-checklist li.valid {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .password-checklist li.invalid {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+  }
+  .login-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  /* Modo oscuro para inputs */
+  .dark-theme .form-group label {
+    color: var(--text-secondary-dark);
+  }
+  .dark-theme .form-group input {
+    background-color: var(--input-background-dark);
+    border-color: var(--input-border-dark);
+    color: var(--input-text-dark);
+  }
+  .dark-theme .password-toggle {
+    color: var(--text-secondary-dark);
+  }
+
+  /* Botón de alternancia de tema en páginas de autenticación */
+  .theme-toggle-auth-pages {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 100;
+  }

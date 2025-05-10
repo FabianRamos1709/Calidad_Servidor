@@ -1,0 +1,119 @@
+.login-container {
+  display: flex;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.login-left {
+  width: 45%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('../assets/tech-background.svg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 3rem;
+}
+
+.brand-content {
+  max-width: 80%;
+}
+
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: white;
+  margin-bottom: 1.5rem;
+}
+
+.login-left h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+.login-left p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.login-right {
+  width: 55%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--background-light);
+  color: var(--text-light);
+}
+
+.theme-toggle-container {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.login-form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 450px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.login-form-container h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  margin-top: 0.5rem;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.register-prompt {
+  margin-top: 2rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.register-prompt a {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+/* Modo oscuro */
+.login-container.dark-mode .login-right {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left,
+  .login-right {
+    width: 100%;
+  }
+
+  .login-left {
+    height: 30vh;
+    min-height: 250px;
+  }
+
+  .login-form-container {
+    padding: 2rem 1rem;
+  }
+}
