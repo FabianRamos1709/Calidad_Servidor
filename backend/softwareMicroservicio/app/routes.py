@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services import create_software
+from app.services import create_software, create_participant
 
 software_routes = Blueprint('software_routes', __name__)
 
@@ -16,3 +16,14 @@ def register():
     if software:
         return jsonify({'message': 'Software registered successfully'}), 201
     return jsonify({'message': 'Software already exists'}), 400
+
+@software_routes.route('/register/participants', methods=['POST'])
+def registerParticipant():
+    data = request.get_json()
+    name = data.get('name')
+    role = data.get('role')
+
+    participant = create_participant(name, role)
+    if participant:
+        return jsonify({'message': 'Participant registered successfully'}), 201
+    return jsonify({'message': 'Participant already exists'}), 400
