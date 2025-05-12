@@ -1,32 +1,100 @@
 from app.models import db, QualityCharacteristic, Subcharacteristic
 
-def create_characteristic(name, description, weight_percentage):
-    existing_characteristic = QualityCharacteristic.query.filter_by(name= name).first()
-    if existing_characteristic:
-        return None
+def create_characteristic_with_subs(name, description, weight_percentage, subcharacteristics):
 
-    new_characteristic = QualityCharacteristic(name= name, description = description, weight_percentage = weight_percentage)
+    new_char = QualityCharacteristic(
+        name=name,
+        description=description,
+        weight_percentage=weight_percentage
+    )
+    db.session.add(new_char)
+    db.session.flush()  
 
-    db.session.add(new_characteristic)
+    for sub in subcharacteristics:
+        sub_name = sub.get('name')
+        sub_desc = sub.get('description', '')
+
+        if not sub_name:
+            continue
+        existing = Subcharacteristic.query.filter_by(name=sub_name).first()
+        if existing:
+            continue
+
+        new_sub = Subcharacteristic(
+            name=sub_name,
+            description=sub_desc,
+            characteristic_id=new_char.id
+        )
+        db.session.add(new_sub)
     db.session.commit()
-    return new_characteristic
+    return new_char
 
 def get_all_characteristics():
-    return QualityCharacteristic.query.all()
+    characteristics = QualityCharacteristic.query.all()
+    results = []
 
-def get_characteristic_by_id(char_id):
-    return QualityCharacteristic.query.get(char_id)
+    for char in characteristics:
+        sub_count = Subcharacteristic.query.filter_by(characteristic_id=char.id).count()
+        results.append({
+            'id': char.id,
+            'name': char.name,
+            'description': char.description,
+            'weight_percentage': float(char.weight_percentage),
+            'subcharacteristic_count': sub_count
+        })
 
-def update_characteristic(char_id, name=None, description=None, weight_percentage=None):
+    return results
+
+
+def get_characteristic_with_subs(char_id):
     characteristic = QualityCharacteristic.query.get(char_id)
     if not characteristic:
         return None
-    if name:
-        characteristic.name = name
-    if description:
-        characteristic.description = description
-    if weight_percentage is not None:
-        characteristic.weight_percentage = weight_percentage
+
+    subs = Subcharacteristic.query.filter_by(characteristic_id=char_id).all()
+
+    return {
+        'id': characteristic.id,
+        'name': characteristic.name,
+        'description': characteristic.description,
+        'weight_percentage': float(characteristic.weight_percentage),
+        'subcharacteristics': [
+            {
+                'id': sub.id,
+                'name': sub.name,
+                'description': sub.description,
+                'max_score': sub.max_score
+            } for sub in subs
+        ]
+    }
+
+def update_characteristic_with_subs(char_id, name, description, weight_percentage, subcharacteristics):
+    characteristic = QualityCharacteristic.query.get(char_id)
+    if not characteristic:
+        return None
+
+    characteristic.name = name
+    characteristic.description = description
+    characteristic.weight_percentage = weight_percentage
+
+    for sub in subcharacteristics:
+        sub_id = sub.get('id')
+        sub_name = sub.get('name')
+        sub_desc = sub.get('description', '')
+
+        if sub_id:
+            existing = Subcharacteristic.query.get(sub_id)
+            if existing and existing.characteristic_id == char_id:
+                existing.name = sub_name
+                existing.description = sub_desc
+        else:
+            new_sub = Subcharacteristic(
+                name=sub_name,
+                description=sub_desc,
+                characteristic_id=char_id
+            )
+            db.session.add(new_sub)
+
     db.session.commit()
     return characteristic
 
@@ -37,37 +105,6 @@ def delete_characteristic(char_id):
     db.session.delete(characteristic)
     db.session.commit()
     return True
-
-
-def create_subcharacteristic(name, description):
-    existing_participant = Subcharacteristic.query.filter_by(name= name).first()
-    if existing_participant:
-        return None
-
-    new_subcharactetristic = Subcharacteristic(name= name, description = description)
-
-    db.session.add(new_subcharactetristic)
-    db.session.commit()
-    return new_subcharactetristic
-
-def get_subcharacteristics_by_characteristic(char_id):
-    return Subcharacteristic.query.filter_by(characteristic_id=char_id).all()
-
-def get_subcharacteristic_by_id(sub_id):
-    return Subcharacteristic.query.get(sub_id)
-
-def update_subcharacteristic(sub_id, name=None, description=None, max_score=None):
-    sub = Subcharacteristic.query.get(sub_id)
-    if not sub:
-        return None
-    if name:
-        sub.name = name
-    if description:
-        sub.description = description
-    if max_score is not None:
-        sub.max_score = max_score
-    db.session.commit()
-    return sub
 
 def delete_subcharacteristic(sub_id):
     sub = Subcharacteristic.query.get(sub_id)

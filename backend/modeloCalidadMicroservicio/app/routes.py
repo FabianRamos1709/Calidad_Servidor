@@ -1,14 +1,11 @@
 from flask import Blueprint, request, jsonify
+from app.models import db
 from app.services import (
-    create_characteristic,
+    get_characteristic_with_subs,
+    create_characteristic_with_subs,
     get_all_characteristics,
-    get_characteristic_by_id,
-    update_characteristic,
+    update_characteristic_with_subs,
     delete_characteristic,
-    create_subcharacteristic,
-    get_subcharacteristics_by_characteristic,
-    get_subcharacteristic_by_id,
-    update_subcharacteristic,
     delete_subcharacteristic
 )
 
@@ -16,41 +13,62 @@ from app.services import (
 modelo_routes = Blueprint('modelo_routes', __name__)
 
 @modelo_routes.route('/caracteristica', methods=['POST'])
-def registerCharacteristic():
+def create_characteristic():
     data = request.get_json()
+    
     name = data.get('name')
     description = data.get('description')
     weight_percentage = data.get('weight_percentage')
+    subcharacteristics = data.get('subcharacteristics', [])
 
-    software = create_characteristic(name, description, weight_percentage)
-    if software:
-        return jsonify({'message': 'Characteristic registered successfully'}), 201
-    return jsonify({'message': 'Characteristic already exists'}), 400
+    if not name or not isinstance(subcharacteristics, list):
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
+
+    try:
+        new_char = create_characteristic_with_subs(name, description, weight_percentage, subcharacteristics)
+        return jsonify({
+            "message": "Característica creada exitosamente",
+            "characteristic_id": new_char.id
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 
 @modelo_routes.route('/caracteristica', methods=['GET'])
 def get_all():
     characteristics = get_all_characteristics()
-    return jsonify([c.serialize() for c in characteristics]), 200
+    return jsonify(characteristics), 200
 
-@modelo_routes.route('/caracteristica/<int:id>', methods=['GET'])
-def get_one(id):
-    characteristic = get_characteristic_by_id(id)
-    if not characteristic:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify(characteristic.serialize()), 200
+@modelo_routes.route('/caracteristica/<int:char_id>', methods=['GET'])
+def get_characteristic_with_subs_route(char_id):
+    result = get_characteristic_with_subs(char_id)
+    if not result:
+        return jsonify({'message': 'Characteristic not found'}), 404
+    return jsonify(result), 200
 
-@modelo_routes.route('/caracteristica/<int:id>', methods=['PUT'])
-def update_char(id):
+
+@modelo_routes.route('/caracteristica/<int:char_id>', methods=['PUT'])
+def updateCharacteristicWithSubs(char_id):
     data = request.get_json()
-    updated = update_characteristic(
-        id,
-        name=data.get('name'),
-        description=data.get('description'),
-        weight_percentage=data.get('weight_percentage')
+
+    name = data.get('name')
+    description = data.get('description')
+    weight_percentage = data.get('weight_percentage')
+    subcharacteristics = data.get('subcharacteristics', [])
+
+    result = update_characteristic_with_subs(
+        char_id,
+        name,
+        description,
+        weight_percentage,
+        subcharacteristics
     )
-    if not updated:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify({'message': 'Updated successfully'}), 200
+
+    if result:
+        return jsonify({'message': 'Characteristic and subcharacteristics updated successfully'}), 200
+    else:
+        return jsonify({'message': 'Characteristic not found'}), 404
 
 @modelo_routes.route('/caracteristica/<int:id>', methods=['DELETE'])
 def delete_char(id):
@@ -58,43 +76,6 @@ def delete_char(id):
     if not success:
         return jsonify({'message': 'Not found'}), 404
     return jsonify({'message': 'Deleted successfully'}), 200
-
-
-@modelo_routes.route('/subcaracteristica', methods=['POST'])
-def registerSubcharacteristic():
-    data = request.get_json()
-    name = data.get('name')
-    description = data.get('description')
-
-    software = create_subcharacteristic(name, description)
-    if software:
-        return jsonify({'message': 'Subcharacteristic registered successfully'}), 201
-    return jsonify({'message': 'Subcharacteristic already exists'}), 400
-
-@modelo_routes.route('/subcaracteristica/by_caracteristica/<int:char_id>', methods=['GET'])
-def get_by_char(char_id):
-    subs = get_subcharacteristics_by_characteristic(char_id)
-    return jsonify([s.serialize() for s in subs]), 200
-
-@modelo_routes.route('/subcaracteristica/<int:id>', methods=['GET'])
-def get_sub(id):
-    sub = get_subcharacteristic_by_id(id)
-    if not sub:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify(sub.serialize()), 200
-
-@modelo_routes.route('/subcaracteristica/<int:id>', methods=['PUT'])
-def update_sub(id):
-    data = request.get_json()
-    updated = update_subcharacteristic(
-        id,
-        name=data.get('name'),
-        description=data.get('description'),
-        max_score=data.get('max_score')
-    )
-    if not updated:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify({'message': 'Updated successfully'}), 200
 
 @modelo_routes.route('/subcaracteristica/<int:id>', methods=['DELETE'])
 def delete_sub(id):

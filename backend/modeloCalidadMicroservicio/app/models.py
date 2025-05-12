@@ -16,6 +16,14 @@ class QualityCharacteristic(db.Model):
     __table_args__ = (
         CheckConstraint('weight_percentage >= 0 AND weight_percentage <= 100', name='check_weight_percentage'),
     )
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'weight_percentage': float(self.weight_percentage)
+        }
 
     def __repr__(self):
         return f'<QualityCharacteristic {self.name}>'
@@ -33,6 +41,15 @@ class Subcharacteristic(db.Model):
     __table_args__ = (
         CheckConstraint('max_score > 0', name='check_max_score'),
     )
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'characteristic_id': self.characteristic_id,
+            'name': self.name,
+            'description': self.description,
+            'max_score': self.max_score
+        }
 
     def __repr__(self):
         return f'<Subcharacteristic {self.name} (max {self.max_score})>'
