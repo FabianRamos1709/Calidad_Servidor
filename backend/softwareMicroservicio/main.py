@@ -10,6 +10,7 @@ from backend.config import Config
 from app.models import db
 from app.routes import software_routes
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)

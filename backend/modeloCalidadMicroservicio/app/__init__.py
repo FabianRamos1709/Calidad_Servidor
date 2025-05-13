@@ -1,5 +1,4 @@
 from flask import Flask
-from app.routes import modelo_routes
 from backend.config import Config
 
 def create_app():
@@ -7,6 +6,7 @@ def create_app():
     app.config.from_object(Config)
 
     # Register routes
+    from app.routes import modelo_routes
     app.register_blueprint(modelo_routes, url_prefix='/modelo')
 
     return app

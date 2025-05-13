@@ -9,6 +9,7 @@ class Software(db.Model):
     city = db.Column(db.String(30), nullable=False)
     general_objective = db.Column(db.String(250), nullable = False)
     description = db.Column(db.String(300), unique=True, nullable=False)
+    version = db.Column(db.String(50), nullable=False)
     registered_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
