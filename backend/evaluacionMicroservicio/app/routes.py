@@ -8,6 +8,6 @@ def create_evaluation_route():
     data = request.get_json()
     evaluation, error = create_evaluation(data)
     if error:
-        return jsonify({'message': 'Error saving evaluation', 'error': error}), 400
+        return jsonify({'message': 'Error guardando la evaluación', 'error': error}), 400
 
-    return jsonify({'message': 'Evaluation saved successfully', 'evaluation_id': evaluation.id}), 201
+    return jsonify({'message': 'Evaluación guardada exitosamente', 'evaluation_id': evaluation.id}), 201

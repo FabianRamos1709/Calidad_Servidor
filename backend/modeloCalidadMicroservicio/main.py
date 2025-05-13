@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from backend.config import Config
-from app.models import db
+from backend.models import db
 from app.routes import modelo_routes
 
 def create_app():

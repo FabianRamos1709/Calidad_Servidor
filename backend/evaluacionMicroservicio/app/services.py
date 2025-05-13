@@ -1,4 +1,4 @@
-from backend.modeloCalidadMicroservicio.app.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary
+from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary
 from sqlalchemy.exc import SQLAlchemyError
 from collections import defaultdict
 
@@ -8,7 +8,7 @@ def create_evaluation(data):
         details = data.get('details', [])
 
         if not software_id or not details:
-            return None, 'Missing required fields'
+            return None, 'Campos Incompletos'
 
         evaluation = Evaluation(
             software_id=software_id,

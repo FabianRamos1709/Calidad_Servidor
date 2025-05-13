@@ -11,10 +11,11 @@ def register():
     city = data.get('city')
     general_objective = data.get('general_objective')
     description = data.get('description')
-    version = data.get('version')
+    version = data.get('version'),
+    user_id = data.get('user_id'),
     participants = data.get('participants', [])  # lista de diccionarios
 
-    result = create_software_with_participants(name, city, general_objective, description, version, participants)
+    result = create_software_with_participants(name, city, general_objective, description, version, participants, user_id)
     if result['success']:
-        return jsonify({'message': 'Software and participants registered successfully'}), 201
+        return jsonify({'message': 'Software registrado exitosamente'}), 201
     return jsonify({'message': result['message']}), 400

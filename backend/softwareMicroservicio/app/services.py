@@ -1,16 +1,17 @@
-from app.models import db, Software, SoftwareParticipant
+from backend.models import db, Software, SoftwareParticipant
 
-def create_software_with_participants(name, city, general_objective, description, version, participants):
+def create_software_with_participants(name, city, general_objective, description, version, participants, user_id):
     existing_software = Software.query.filter_by(name=name).first()
     if existing_software:
-        return {'success': False, 'message': 'Software already exists'}
+        return {'success': False, 'message': 'El software ya existe'}
 
     new_software = Software(
         name=name,
         city=city,
         general_objective=general_objective,
         description=description,
-        version=version
+        version=version,
+        user_id=user_id
     )
     db.session.add(new_software)
     db.session.flush()  

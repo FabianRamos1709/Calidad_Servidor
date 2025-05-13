@@ -1,6 +1,14 @@
-from app.models import db, QualityCharacteristic, Subcharacteristic
+from backend.models import db, QualityCharacteristic, Subcharacteristic
+from sqlalchemy import func
 
 def create_characteristic_with_subs(name, description, weight_percentage, subcharacteristics):
+    suma_actual = db.session.query(func.sum(QualityCharacteristic.weight_percentage))\
+                    .scalar() or 0
+
+    nueva_suma = suma_actual + weight_percentage
+
+    if nueva_suma > 100:
+        raise ValueError(f"La suma de los pesos supera el 100% ({nueva_suma}%).")
 
     new_char = QualityCharacteristic(
         name=name,

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import db
+from backend.models import db
 from app.services import (
     get_characteristic_with_subs,
     create_characteristic_with_subs,
@@ -29,7 +29,10 @@ def create_characteristic():
         return jsonify({
             "message": "Característica creada exitosamente",
             "characteristic_id": new_char.id
-        }), 201
+        }), 201        
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -44,7 +47,7 @@ def get_all():
 def get_characteristic_with_subs_route(char_id):
     result = get_characteristic_with_subs(char_id)
     if not result:
-        return jsonify({'message': 'Characteristic not found'}), 404
+        return jsonify({'message': 'Caracteristica no encontrada'}), 404
     return jsonify(result), 200
 
 
@@ -66,20 +69,20 @@ def updateCharacteristicWithSubs(char_id):
     )
 
     if result:
-        return jsonify({'message': 'Characteristic and subcharacteristics updated successfully'}), 200
+        return jsonify({'message': 'Caracteristica y subcaracteristicas actualizadas correctamente'}), 200
     else:
-        return jsonify({'message': 'Characteristic not found'}), 404
+        return jsonify({'message': 'Caracteristica no encontrada'}), 404
 
 @modelo_routes.route('/caracteristica/<int:id>', methods=['DELETE'])
 def delete_char(id):
     success = delete_characteristic(id)
     if not success:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify({'message': 'Deleted successfully'}), 200
+        return jsonify({'message': 'No encontrada'}), 404
+    return jsonify({'message': 'Eliminada exitosamente'}), 200
 
 @modelo_routes.route('/subcaracteristica/<int:id>', methods=['DELETE'])
 def delete_sub(id):
     success = delete_subcharacteristic(id)
     if not success:
-        return jsonify({'message': 'Not found'}), 404
-    return jsonify({'message': 'Deleted successfully'}), 200
+        return jsonify({'message': 'No encontrada'}), 404
+    return jsonify({'message': 'Eliminada exitosamente'}), 200
