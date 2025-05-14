@@ -57,19 +57,20 @@ class Evaluation(db.Model):
     details = db.relationship('EvaluationDetail', backref='evaluation', cascade='all, delete-orphan')
     characteristic_summaries = db.relationship('EvaluationCharacteristicSummary', backref='evaluation', cascade='all, delete-orphan')
 
-
 class EvaluationCharacteristicSummary(db.Model):
     __tablename__ = 'evaluation_characteristic_summary'
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='CASCADE'), nullable=False)
+    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='SET NULL'))  # SET NULL por seguridad
+
     value = db.Column(db.Integer, nullable=False)
     max_value = db.Column(db.Integer, nullable=False)
     result_percentage = db.Column(db.Numeric(5, 2), nullable=False)
     weighted_percentage = db.Column(db.Numeric(5, 2), nullable=False)
 
-    characteristic = db.relationship("QualityCharacteristic", backref="evaluations_summary")
+    characteristic_name = db.Column(db.String(100), nullable=False)
+    weight_percentage = db.Column(db.Numeric(5, 2), nullable=False)
 
 
 class EvaluationDetail(db.Model):
@@ -77,15 +78,18 @@ class EvaluationDetail(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='CASCADE'), nullable=False)
+    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='SET NULL'))  # Cambia a SET NULL por seguridad
     score = db.Column(db.SmallInteger, nullable=False)
     comment = db.Column(db.Text, nullable=True)
 
-    subcharacteristic = db.relationship("Subcharacteristic", backref="evaluation_details")
+    subcharacteristic_name = db.Column(db.String(100), nullable=False)
+    subcharacteristic_description = db.Column(db.Text)
+    max_score = db.Column(db.SmallInteger, nullable=False)
 
     __table_args__ = (
         db.CheckConstraint('score BETWEEN 0 AND 3', name='check_score_between_0_and_3'),
     )
+
 
 class QualityCharacteristic(db.Model):
     __tablename__ = 'quality_characteristics'

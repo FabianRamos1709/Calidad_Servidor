@@ -1,4 +1,4 @@
-from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary, Subcharacteristic, Software
+from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary, QualityCharacteristic, Subcharacteristic, Software
 from sqlalchemy.exc import SQLAlchemyError
 from collections import defaultdict
 from sqlalchemy.orm import joinedload
@@ -11,15 +11,14 @@ def create_evaluation(data):
         if not software_id or not details:
             return None, 'Campos Incompletos'
 
-        evaluation = Evaluation(
-            software_id=software_id,
-        )
+        evaluation = Evaluation(software_id=software_id)
         db.session.add(evaluation)
-        db.session.flush()  
+        db.session.flush()
 
         grouped = defaultdict(lambda: {
             'sub_scores': [],
-            'percentage': 0.0
+            'percentage': 0.0,
+            'sub_count': 0
         })
 
         for detail in details:
@@ -29,16 +28,25 @@ def create_evaluation(data):
             char_id = detail.get('characteristic_id')
             char_percent = detail.get('characteristic_percentage')
 
+            sub = Subcharacteristic.query.get(sub_id)
+            if not sub:
+                db.session.rollback()
+                return None, f'Subcaracterística con ID {sub_id} no encontrada.'
+
             evaluation_detail = EvaluationDetail(
                 evaluation_id=evaluation.id,
-                subcharacteristic_id=sub_id,
+                subcharacteristic_id=sub.id,
                 score=score,
-                comment=comment
+                comment=comment,
+                subcharacteristic_name=sub.name,
+                subcharacteristic_description=sub.description,
+                max_score=sub.max_score
             )
             db.session.add(evaluation_detail)
 
             grouped[char_id]['sub_scores'].append(score)
             grouped[char_id]['percentage'] = char_percent
+            grouped[char_id]['sub_count'] += 1
 
         global_score = 0.0
         for char_id, info in grouped.items():
@@ -49,26 +57,33 @@ def create_evaluation(data):
             result_percentage = (value / max_value) * 100 if max_value > 0 else 0.0
             weighted_percentage = (result_percentage * percentage) / 100
 
-            global_score += weighted_percentage
+            characteristic = QualityCharacteristic.query.get(char_id)
+            if not characteristic:
+                db.session.rollback()
+                return None, f'Característica con ID {char_id} no encontrada.'
 
             summary = EvaluationCharacteristicSummary(
                 evaluation_id=evaluation.id,
-                characteristic_id=char_id,
+                characteristic_id=characteristic.id,
                 value=value,
                 max_value=max_value,
                 result_percentage=round(result_percentage, 2),
-                weighted_percentage=round(weighted_percentage, 2)
+                weighted_percentage=round(weighted_percentage, 2),
+                characteristic_name=characteristic.name,
+                weight_percentage=characteristic.weight_percentage
             )
             db.session.add(summary)
+            global_score += weighted_percentage
 
         evaluation.global_score_percentage = round(global_score, 2)
         db.session.commit()
 
         return evaluation, None
-    
+
     except SQLAlchemyError as e:
         db.session.rollback()
         return None, str(e)
+
 
 def get_evaluation_details_by_software_id(software_id):
     evaluation = Evaluation.query.filter_by(software_id=software_id).order_by(Evaluation.date.desc()).first()
@@ -148,19 +163,17 @@ def get_characteristic_summary_by_software(software_id, evaluation_id):
     if not evaluation:
         return []
 
-    summaries = EvaluationCharacteristicSummary.query.filter_by(evaluation_id=evaluation.id).options(
-        joinedload(EvaluationCharacteristicSummary.characteristic)
-    ).all()
+    summaries = EvaluationCharacteristicSummary.query.filter_by(evaluation_id=evaluation.id).all()
 
     result = []
     for summary in summaries:
         result.append({
-            'characteristic_name': summary.characteristic.name,
+            'characteristic_name': summary.characteristic_name,  
             'value': summary.value,
             'max_value': summary.max_value,
             'result_percentage': f"{summary.result_percentage:.2f}%",
             'weighted_percentage': f"{summary.weighted_percentage:.2f}%",
-            'max_possible_percentage': f"{summary.characteristic.weight_percentage:.2f}%"
+            'max_possible_percentage': f"{summary.weight_percentage:.2f}"  
         })
 
     return {
