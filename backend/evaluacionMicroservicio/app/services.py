@@ -1,4 +1,4 @@
-from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary, Subcharacteristic
+from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary, Subcharacteristic, Software
 from sqlalchemy.exc import SQLAlchemyError
 from collections import defaultdict
 from sqlalchemy.orm import joinedload
@@ -103,4 +103,68 @@ def get_evaluation_details_by_software_id(software_id):
     return {
         'evaluation_id': evaluation.id,
         'characteristics': result
+    }
+
+def get_result_label(percentage):
+    if percentage <= 30:
+        return "Deficiente"
+    elif percentage <= 50:
+        return "Insuficiente"
+    elif percentage <= 70:
+        return "Aceptable"
+    elif percentage <= 81:
+        return "Sobresaliente"
+    else:
+        return "Excelente"
+
+def get_evaluated_softwares_by_user(user_id):
+    softwares = Software.query.filter_by(user_id=user_id).options(
+        joinedload(Software.evaluations)
+    ).all()
+
+    results = []
+    for software in softwares:
+        if not software.evaluations:
+            continue
+
+        latest_evaluation = max(software.evaluations, key=lambda e: e.date)
+        percentage = float(latest_evaluation.global_score_percentage or 0)
+        result_label = get_result_label(percentage)
+
+        results.append({
+            'software_id': software.id,
+            'software_name': software.name,
+            'evaluation_id': latest_evaluation.id,
+            'evaluation_date': latest_evaluation.date.strftime('%d/%m/%Y'),
+            'global_percentage': f"{percentage:.2f}%",
+            'result': result_label
+        })
+
+    return results
+
+def get_characteristic_summary_by_software(software_id, evaluation_id):
+    evaluation = Evaluation.query.filter_by(id=evaluation_id, software_id=software_id).first()
+
+    if not evaluation:
+        return []
+
+    summaries = EvaluationCharacteristicSummary.query.filter_by(evaluation_id=evaluation.id).options(
+        joinedload(EvaluationCharacteristicSummary.characteristic)
+    ).all()
+
+    result = []
+    for summary in summaries:
+        result.append({
+            'characteristic_name': summary.characteristic.name,
+            'value': summary.value,
+            'max_value': summary.max_value,
+            'result_percentage': f"{summary.result_percentage:.2f}%",
+            'weighted_percentage': f"{summary.weighted_percentage:.2f}%",
+            'max_possible_percentage': f"{summary.characteristic.weight_percentage:.2f}%"
+        })
+
+    return {
+        'evaluation_id': evaluation.id,
+        'software_id': software_id,
+        'summaries': result
     }

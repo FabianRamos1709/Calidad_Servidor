@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services import create_evaluation, get_evaluation_details_by_software_id
+from app.services import create_evaluation, get_evaluation_details_by_software_id, get_evaluated_softwares_by_user, get_characteristic_summary_by_software
 
 evaluation_routes = Blueprint('evaluation_routes', __name__)
 
@@ -21,3 +21,20 @@ def get_evaluation_details(software_id):
         return jsonify(data), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@evaluation_routes.route('/software-evaluados/<int:user_id>', methods=['GET'])
+def get_evaluated_softwares(user_id):
+    try:
+        data = get_evaluated_softwares_by_user(user_id)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@evaluation_routes.route('/resultados/<int:software_id>//<int:evaluation_id>', methods=['GET'])
+def get_software_characteristic_summary(software_id, evaluation_id):
+    try:
+        data = get_characteristic_summary_by_software(software_id, evaluation_id)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
