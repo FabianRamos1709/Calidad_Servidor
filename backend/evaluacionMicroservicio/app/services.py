@@ -1,6 +1,7 @@
-from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary
+from backend.models import db, Evaluation, EvaluationDetail, EvaluationCharacteristicSummary, Subcharacteristic
 from sqlalchemy.exc import SQLAlchemyError
 from collections import defaultdict
+from sqlalchemy.orm import joinedload
 
 def create_evaluation(data):
     try:
@@ -68,3 +69,38 @@ def create_evaluation(data):
     except SQLAlchemyError as e:
         db.session.rollback()
         return None, str(e)
+
+def get_evaluation_details_by_software_id(software_id):
+    evaluation = Evaluation.query.filter_by(software_id=software_id).order_by(Evaluation.date.desc()).first()
+    if not evaluation:
+        return None
+
+    details = EvaluationDetail.query.filter_by(evaluation_id=evaluation.id).options(
+        joinedload(EvaluationDetail.subcharacteristic).joinedload(Subcharacteristic.characteristic)
+    ).all()
+
+    grouped = {}
+    for detail in details:
+        sub = detail.subcharacteristic
+        qc = sub.characteristic
+
+        if qc.name not in grouped:
+            grouped[qc.name] = {
+                'quality_characteristic_id': qc.id,
+                'quality_characteristic_name': qc.name,
+                'subcharacteristics': []
+            }
+
+        grouped[qc.name]['subcharacteristics'].append({
+            'subcharacteristic_id': sub.id,
+            'subcharacteristic_name': sub.name,
+            'score': detail.score,
+            'comment': detail.comment
+        })
+
+    result = list(grouped.values())
+
+    return {
+        'evaluation_id': evaluation.id,
+        'characteristics': result
+    }

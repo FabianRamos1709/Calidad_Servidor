@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services import create_evaluation
+from app.services import create_evaluation, get_evaluation_details_by_software_id
 
 evaluation_routes = Blueprint('evaluation_routes', __name__)
 
@@ -11,3 +11,13 @@ def create_evaluation_route():
         return jsonify({'message': 'Error guardando la evaluación', 'error': error}), 400
 
     return jsonify({'message': 'Evaluación guardada exitosamente', 'evaluation_id': evaluation.id}), 201
+
+@evaluation_routes.route('/detalle/<int:software_id>', methods=['GET'])
+def get_evaluation_details(software_id):
+    try:
+        data = get_evaluation_details_by_software_id(software_id)
+        if not data:
+            return jsonify({'success': False, 'message': 'No se encontraron evaluaciones para este software'}), 404
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

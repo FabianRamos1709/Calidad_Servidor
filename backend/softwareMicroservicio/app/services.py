@@ -1,4 +1,7 @@
-from backend.models import db, Software, SoftwareParticipant
+from backend.models import db, Software, SoftwareParticipant, Evaluation
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload
+from datetime import datetime
 
 def create_software_with_participants(name, city, general_objective, description, version, participants, user_id):
     existing_software = Software.query.filter_by(name=name).first()
@@ -30,3 +33,36 @@ def create_software_with_participants(name, city, general_objective, description
 
     db.session.commit()
     return {'success': True}
+
+def get_software_by_user(user_id):
+    softwares = Software.query.filter_by(user_id=user_id).options(
+        joinedload(Software.evaluations)
+    ).all()
+
+    result = []
+    for software in softwares:
+        
+        evaluation = None
+        if software.evaluations:
+            latest_eval = max(software.evaluations, key=lambda e: e.date or datetime.min)
+            evaluation = {
+                'id': latest_eval.id,
+                'date': latest_eval.date.isoformat() if latest_eval.date else None,
+                'global_score_percentage': float(latest_eval.global_score_percentage) if latest_eval.global_score_percentage is not None else None,
+            }
+
+        result.append({
+            'id': software.id,
+            'name': software.name,
+            'city': software.city,
+            'general_objective': software.general_objective,
+            'description': software.description,
+            'version': software.version,
+            'registered_at': software.registered_at.isoformat(),
+            'evaluation': evaluation
+        })
+
+    return result
+
+
+
