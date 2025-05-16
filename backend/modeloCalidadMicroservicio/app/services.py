@@ -121,3 +121,67 @@ def delete_subcharacteristic(sub_id):
     db.session.delete(sub)
     db.session.commit()
     return True
+
+
+#para asignar vincular los items y subcaracteristicas a un software
+
+def assign_characteristics_to_software(software_id, characteristic_ids):
+    from backend.models import Software, QualityCharacteristic, SoftwareCharacteristic
+
+    software = Software.query.get(software_id)
+    if not software:
+        return {'success': False, 'message': 'Software no encontrado'}
+
+    # Obtener las características ya asignadas
+    existing_assignments = SoftwareCharacteristic.query.filter_by(software_id=software_id).all()
+    existing_char_ids = [assign.characteristic_id for assign in existing_assignments]
+    
+    # Calcular características totales (existentes + nuevas)
+    all_char_ids = set(existing_char_ids)
+    for cid in characteristic_ids:
+        all_char_ids.add(cid)
+    
+    # Verificar que no exceda el límite de 7 características
+    if len(all_char_ids) > 7:
+        return {'success': False, 'message': 'Solo se pueden asignar hasta 7 características'}
+
+    # Agregar solo las características que no estén ya asignadas
+    for cid in characteristic_ids:
+        char = QualityCharacteristic.query.get(cid)
+        if not char:
+            continue
+            
+        # Verificar si ya existe esta asignación
+        if cid not in existing_char_ids:
+            db.session.add(SoftwareCharacteristic(software_id=software_id, characteristic_id=cid))
+
+    db.session.commit()
+    return {'success': True, 'message': 'Características asignadas correctamente'}
+
+def get_items_by_software(software_id):
+    from backend.models import SoftwareCharacteristic, QualityCharacteristic
+
+    assignments = SoftwareCharacteristic.query.filter_by(software_id=software_id).all()
+
+    result = []
+    for assignment in assignments:
+        char = assignment.characteristic
+        subcaracs = [
+            {
+                "id": sub.id,
+                "name": sub.name,
+                "description": sub.description,
+                "max_score": sub.max_score
+            }
+            for sub in char.subcharacteristics
+        ]
+        result.append({
+            'id': char.id,
+            'name': char.name,
+            'description': char.description,
+            'weight_percentage': float(char.weight_percentage),
+            'software_id': software_id,
+            'subcharacteristics': subcaracs
+        })
+
+    return result

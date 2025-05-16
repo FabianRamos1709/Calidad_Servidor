@@ -6,7 +6,9 @@ from app.services import (
     get_all_characteristics,
     update_characteristic_with_subs,
     delete_characteristic,
-    delete_subcharacteristic
+    delete_subcharacteristic,
+    assign_characteristics_to_software,
+    get_items_by_software
 )
 
 
@@ -86,3 +88,25 @@ def delete_sub(id):
     if not success:
         return jsonify({'message': 'No encontrada'}), 404
     return jsonify({'message': 'Eliminada exitosamente'}), 200
+
+
+#misma monda, para lo del software y los items
+
+@modelo_routes.route('/asignar_item', methods=['POST'])
+def asignar_item_a_software():
+    data = request.get_json()
+    software_id = data.get('software_id')
+    characteristic_ids = data.get('characteristics')  # lista de IDs
+
+    if not software_id or not isinstance(characteristic_ids, list):
+        return jsonify({'error': 'Datos incompletos'}), 400
+
+    result = assign_characteristics_to_software(software_id, characteristic_ids)
+    status_code = 200 if result['success'] else 400
+    return jsonify(result), status_code
+
+
+@modelo_routes.route('/items_por_software/<int:software_id>', methods=['GET'])
+def obtener_items_de_software(software_id):
+    result = get_items_by_software(software_id)
+    return jsonify({'items': result}), 200

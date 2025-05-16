@@ -36,12 +36,26 @@
   color: black;
 }
 
-.action-button {
+.action-button, .icon-button {
   background: none;
   border: none;
   cursor: pointer;
   margin: 0 5px;
   font-size: 16px;
+}
+
+.icon-button {
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #a2ff00;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+  background-color: rgba(162, 255, 0, 0.1);
 }
 
 /* Modal styles */
@@ -59,7 +73,7 @@
 }
 
 .modal {
-  background-color: white;
+  
   color: black;
   padding: 20px;
   border-radius: 8px;
