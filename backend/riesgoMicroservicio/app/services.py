@@ -1,6 +1,6 @@
 from backend.models import (
     db, SoftwareRisk, RiskOwnership, RiskClassification,
-    RiskEvaluation, RiskControl, LikelihoodEnum, ImpactEnum
+    RiskEvaluation, RiskControl, LikelihoodEnum, ImpactEnum, RiskMitigation
 )
 
 def register_software_risk(data):
@@ -28,6 +28,7 @@ def register_software_risk(data):
                 owner_role=ownership["owner_role"]
             )
             db.session.add(risk_owner)
+            db.session.flush()
 
         # Clasificación del riesgo
         classification = data.get("classification")
@@ -85,6 +86,7 @@ def register_software_risk(data):
                 acceptance=acceptance
             )
             db.session.add(risk_eval)
+            db.session.flush()
 
         # Controles del riesgo
         controls = data.get("controls")
@@ -137,6 +139,19 @@ def register_software_risk(data):
             )
             db.session.add(control)
 
+            mitigation = RiskMitigation(
+                risk_id=risk.id,
+                evaluation_id=risk_eval.id if evaluation else None,
+                ownership_id=risk_owner.id if ownership else None,
+                risk_code=risk.risk_code,
+                risk_zone=risk_zone,
+                risk_description=risk.description,
+                responsible=risk_owner.owner_name if ownership else "No asignado",
+                phase=None,
+                response_type=None,
+                mitigation_plan=None
+            )
+            db.session.add(mitigation)
 
         db.session.commit()
         return {"message": "Riesgo registrado correctamente", "risk_id": risk.id}, 201
