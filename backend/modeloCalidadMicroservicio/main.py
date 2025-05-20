@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager
 from backend.config import Config
 from backend.models import db
 from app.routes import modelo_routes
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
@@ -17,7 +18,7 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all() 
-
+    CORS(app, origins="http://localhost:5173", supports_credentials=True)
     app.register_blueprint(modelo_routes, url_prefix='/modelo')
     return app
 

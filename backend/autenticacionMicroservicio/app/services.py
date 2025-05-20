@@ -17,6 +17,14 @@ def create_user(username, password, email):
 def authenticate_user(email, password):
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password_hash, password):
-        token = create_access_token(identity=user.id)
-        return token
+        token = create_access_token(identity=str(user.id))
+
+        return {
+            "token": token,
+            "user": {  # Devolver datos del usuario
+                "id": user.id,
+                "username": user.username,
+                "email": user.email
+            }
+        }
     return None

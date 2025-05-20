@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegistroPage';
 import DashboardPage from './pages/DashboardPage';
+import EvoluacionPage from './pages/RegistroSofware';
+import { AuthProvider } from './context/authContext';
 import './App.css';
 
 function App() {
@@ -30,7 +32,9 @@ function App() {
     setDarkMode(prevMode => !prevMode);
   };
 
+
   return (
+    <AuthProvider>
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
       <Router>
         <Routes>
@@ -49,7 +53,11 @@ function App() {
               <DashboardPage />
             </MainLayout>
           } />
-          
+          <Route path="/evaluacionSof" element={
+            <MainLayout>
+              <EvoluacionPage />
+            </MainLayout>
+          } />
           {/* Redirección de la ruta raíz a home */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           
@@ -71,6 +79,8 @@ function App() {
         </Routes>
       </Router>
     </ThemeContext.Provider>
+    </AuthProvider>
+
   );
 }
 

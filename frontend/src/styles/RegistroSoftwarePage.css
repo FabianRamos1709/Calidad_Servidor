@@ -1,4 +1,4 @@
-.dashboard-container {
+.registro-container {
   background-color: #05010d;
   color: white;
   padding: 30px;
@@ -20,42 +20,52 @@
   border-radius: 4px;
 }
 
-.item-table {
+.software-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.item-table th, .item-table td {
+.software-table th, .software-table td {
   border: 1px solid #444;
   padding: 10px;
   text-align: center;
 }
 
-.item-table th {
+.software-table th {
   background-color: #a2ff00;
   color: black;
 }
 
-.action-button, .icon-button {
+.icon-button {
   background: none;
   border: none;
   cursor: pointer;
-  margin: 0 5px;
+  margin: 5px;
   font-size: 16px;
 }
 
-.icon-button {
-  padding: 5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #a2ff00;
+.icon-button.view-result {
+  background-color: #00aaff;
+  color: white;
+  padding: 8px 12px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  font-weight: bold;
 }
 
-.icon-button:hover {
-  background-color: rgba(162, 255, 0, 0.1);
+.icon-button.start-test {
+  background-color: #ffcc00;
+  color: black;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.icon-button.assign-items {
+  background-color: #00ff55;
+  color: black;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 /* Modal styles */
@@ -73,7 +83,7 @@
 }
 
 .modal {
-  
+  background-color: white;
   color: black;
   padding: 20px;
   border-radius: 8px;
@@ -85,7 +95,6 @@
 
 .modal-title {
   font-size: 24px;
-  margin-top: 0;
   margin-bottom: 20px;
   text-align: center;
 }
@@ -138,35 +147,19 @@
   margin-left: 10px;
 }
 
-/* Subcaracterísticas styles */
-.subcaracteristica-item {
-  margin-bottom: 10px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.subcaracteristica-header {
-  padding: 8px 12px;
+/* Participantes */
+.participante-item {
   background-color: #f5f5f5;
+  color: black;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.participante-form {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   align-items: center;
-  cursor: pointer;
-}
-
-.subcaracteristica-name {
-  font-weight: 500;
-}
-
-.highlighted {
-  color: #a2ff00;
-  background-color: #333;
-}
-
-.subcaracteristica-details {
-  padding: 10px;
-  background-color: #fafafa;
 }
 
 .add-sub-button {
@@ -178,16 +171,24 @@
   cursor: pointer;
   font-weight: bold;
   margin-top: 10px;
-  width: 100%;
 }
-
-.subcaracteristica-form {
-  margin-top: 15px;
-  padding: 15px;
-  border: 1px dashed #ccc;
+.edit-button{
+  background-color: #a2ff00;
+  color: black;
+  cursor: pointer;
+  border: none;
+  padding: 8px 16px;
   border-radius: 4px;
+  margin-right: 5px;
+  font-weight: bold;
 }
-
-.toggle-icon {
-  font-size: 12px;
+.delate-button{
+  background-color: #ff5c5c;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-left: 5px;
+  font-weight: bold;
 }

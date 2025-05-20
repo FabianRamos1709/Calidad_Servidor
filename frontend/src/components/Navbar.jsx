@@ -3,6 +3,7 @@ import { User, Menu, X } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
 import '../styles/Navbar.css';
+import { useAuth } from '../context/authContext'
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { darkMode } = useContext(ThemeContext);
   const userMenuRef = useRef(null);
-  
+  const { user, logout } = useAuth();
   // Cerrar el menú cuando el ancho de la ventana cambia a más de 1024px
   useEffect(() => {
     const handleResize = () => {
@@ -47,8 +48,7 @@ export default function Navbar() {
 
   // Función para manejar el logout
   const handleLogout = () => {
-    // Aquí implementarías la lógica de cierre de sesión
-    // Por ahora, solo redirige al login
+    logout();
     navigate('/login');
   };
 
@@ -67,7 +67,7 @@ export default function Navbar() {
             <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`}>Dashboard</Link>
             <Link to="/sobrenosotros" className={`nav-link ${isActive('/sobrenosotros')}`}>Sobre Nosotros</Link>
             <Link to="/contactenos" className={`nav-link ${isActive('/contactenos')}`}>Contáctenos</Link>
-            <Link to="/evolucino" className={`nav-link ${isActive('/evolucion')}`}>Ecolución</Link>
+            <Link to="/evaluacionSof" className={`nav-link ${isActive('/evaluacionSof')}`}>Evolución</Link>
             <Link to="/resultados" className={`nav-link ${isActive('/resultados')}`}>Resultados</Link>
           </div>
           
@@ -79,10 +79,10 @@ export default function Navbar() {
               
               {userMenuOpen && (
                 <div className="user-dropdown">
-                  <div className="user-info">
-                    <span className="user-name">Usuario</span>
-                    <span className="user-email">usuario@ejemplo.com</span>
-                  </div>
+                    <div className="user-info">
+                      <span className="user-name">{user?.username}</span>
+                      <span className="user-email">{user?.email}</span>
+                    </div>
                   <div className="dropdown-divider"></div>
                   <Link to="/perfil" className="dropdown-item">Mi Perfil</Link>
                   <Link to="/configuracion" className="dropdown-item">Configuración</Link>

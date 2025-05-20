@@ -3,15 +3,19 @@ import { ThemeContext } from '../context/ThemeContext';
 import '../styles/RegistroPage.css';
 import { Link } from 'react-router-dom';
 import '../styles/global.css';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 const RegisterPage = () => {
+  const navigate = useNavigate(); // Inicializa useNavigate
   const [formData, setFormData] = useState({
     email: '',
+    username: '',
     password: '',
     confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [registrationError, setRegistrationError] = useState(''); // Nuevo estado para errores de registro
   const { darkMode } = useContext(ThemeContext);
 
   const handleChange = (e) => {
@@ -32,7 +36,7 @@ const RegisterPage = () => {
     const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
     return regex.test(password);
   };
-  
+
   const [passwordChecklist, setPasswordChecklist] = useState({
     length: false,
     uppercase: false,
@@ -40,8 +44,10 @@ const RegisterPage = () => {
     special: false
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // ¡Haz la función asíncrona!
     e.preventDefault();
+    setPasswordError('');
+    setRegistrationError(''); // Limpiar errores previos
 
     if (formData.password !== formData.confirmPassword) {
       setPasswordError('Las contraseñas no coinciden');
@@ -53,11 +59,33 @@ const RegisterPage = () => {
       return;
     }
 
-    setPasswordError('');
-    console.log('Datos enviados:', formData);
-    // fetch(...) aquí va tu lógica de registro
-  };
+    try {
+      const response = await fetch('http://127.0.0.1:5001/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          username: formData.username 
+        })
+      });
 
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Registro exitoso!', data);
+        // Redirige al usuario a la página de inicio de sesión o muestra un mensaje de éxito
+        navigate('/login'); // Redirige al login
+      } else if (response.status === 400) {
+        setRegistrationError('El usuario ya existe');
+      } else {
+        setRegistrationError('Error al registrar usuario. Inténtalo de nuevo.');
+        console.error('Error al registrar:', response.status, response.statusText);
+      }
+    } catch (error) {
+      setRegistrationError('Error de conexión con el servidor.');
+      console.error('Error de conexión:', error);
+    }
+  };
   return (
     <div className={`login-container register-layout ${darkMode ? 'dark-mode' : ''}`}>
       <div className="login-right">
@@ -72,6 +100,18 @@ const RegisterPage = () => {
                 id="email"
                 name="email"
                 value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="username">Usuario</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 required
               />
@@ -147,6 +187,7 @@ const RegisterPage = () => {
         </div>
       </div>
     </div>
+    
   );
 };
 

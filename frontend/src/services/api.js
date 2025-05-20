@@ -72,23 +72,6 @@ export const authService = {
   },
 };
 
-// Aquí puedes agregar más servicios para diferentes recursos
-// Por ejemplo:
-
-/*
-export const userService = {
-  getProfile: async () => {
-    return fetchWithAuth('/user/profile');
-  },
-  
-  updateProfile: async (userData) => {
-    return fetchWithAuth('/user/profile', {
-      method: 'PUT',
-      body: JSON.stringify(userData),
-    });
-  },
-};
-*/
 
 export default {
   auth: authService,

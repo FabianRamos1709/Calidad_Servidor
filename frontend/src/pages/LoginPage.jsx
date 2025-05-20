@@ -1,16 +1,13 @@
 import { useState, useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 import '../styles/LoginPage.css';
-import { Link } from 'react-router-dom';
-import '../styles/global.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/authContext';
 
 const LoginPage = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const { darkMode } = useContext(ThemeContext);
 
@@ -22,20 +19,28 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí implementarías la lógica para enviar los datos al backend Flask
-    console.log('Datos enviados:', formData);
-    // Ejemplo: 
-    // fetch('http://localhost:5000/api/login', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData)
-    // })
-    // .then(res => res.json())
-    // .then(data => console.log(data))
-    // .catch(err => console.error(err));
-    navigate('/home');
+
+    try {
+      const response = await fetch("http://localhost:5001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', result.token);
+        login(result.user); // Guardar datos del usuario
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      alert("Error de conexión con el servidor");
+    }
+
   };
 
   return (
@@ -58,9 +63,9 @@ const LoginPage = () => {
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="email">Nombre de usuario o correo electrónico</label>
+              <label htmlFor="email">Correo electrónico</label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 name="email"
                 value={formData.email}

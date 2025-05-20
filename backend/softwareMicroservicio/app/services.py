@@ -1,13 +1,11 @@
-from backend.models import db, Software, SoftwareParticipant, Evaluation
-from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import joinedload
-from datetime import datetime
+from backend.models import db, Software, SoftwareParticipant
 
 def create_software_with_participants(name, city, general_objective, description, version, participants, user_id):
-    existing_software = Software.query.filter_by(name=name).first()
+    # Verificar existencia incluyendo user_id
+    existing_software = Software.query.filter_by(name=name, user_id=user_id).first()
     if existing_software:
-        return {'success': False, 'message': 'El software ya existe'}
-
+        return {'success': False, 'message': 'Ya tienes un software con este nombre'}
+    
     new_software = Software(
         name=name,
         city=city,
@@ -32,8 +30,9 @@ def create_software_with_participants(name, city, general_objective, description
         db.session.add(new_participant)
 
     db.session.commit()
-    return {'success': True}
+    return {'success': True, 'message': 'Software registrado', 'software': new_software.to_dict()}
 
+"""
 def get_software_by_user(user_id):
     softwares = Software.query.filter_by(user_id=user_id).options(
         joinedload(Software.evaluations)
@@ -62,7 +61,4 @@ def get_software_by_user(user_id):
             'evaluation': evaluation
         })
 
-    return result
-
-
-
+    return result"""

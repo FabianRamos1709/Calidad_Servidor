@@ -23,16 +23,24 @@ class Software(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     city = db.Column(db.String(30), nullable=False)
     general_objective = db.Column(db.String(250), nullable = False)
-    description = db.Column(db.String(300), unique=True, nullable=False)
+    description = db.Column(db.String(300), nullable=False)
     version = db.Column(db.String(50), nullable=False)
     registered_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     user = db.relationship('User', backref=db.backref('software', cascade='all, delete', lazy=True))
     evaluations = db.relationship("Evaluation", backref="software", cascade="all, delete-orphan")
-
     def __repr__(self):
         return f'<Software {self.name}>'
-    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'city': self.city,
+            'general_objective': self.general_objective,
+            'description': self.description,
+            'version': self.version,
+            'user_id': self.user_id
+        }
 class SoftwareParticipant(db.Model):
     __tablename__ = 'software_participants'
 
@@ -57,20 +65,19 @@ class Evaluation(db.Model):
     details = db.relationship('EvaluationDetail', backref='evaluation', cascade='all, delete-orphan')
     characteristic_summaries = db.relationship('EvaluationCharacteristicSummary', backref='evaluation', cascade='all, delete-orphan')
 
+
 class EvaluationCharacteristicSummary(db.Model):
     __tablename__ = 'evaluation_characteristic_summary'
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='SET NULL'))  # SET NULL por seguridad
-
+    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='CASCADE'), nullable=False)
     value = db.Column(db.Integer, nullable=False)
     max_value = db.Column(db.Integer, nullable=False)
     result_percentage = db.Column(db.Numeric(5, 2), nullable=False)
     weighted_percentage = db.Column(db.Numeric(5, 2), nullable=False)
 
-    characteristic_name = db.Column(db.String(100), nullable=False)
-    weight_percentage = db.Column(db.Numeric(5, 2), nullable=False)
+    characteristic = db.relationship("QualityCharacteristic", backref="evaluations_summary")
 
 
 class EvaluationDetail(db.Model):
@@ -78,18 +85,15 @@ class EvaluationDetail(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='SET NULL'))  # Cambia a SET NULL por seguridad
+    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='CASCADE'), nullable=False)
     score = db.Column(db.SmallInteger, nullable=False)
     comment = db.Column(db.Text, nullable=True)
 
-    subcharacteristic_name = db.Column(db.String(100), nullable=False)
-    subcharacteristic_description = db.Column(db.Text)
-    max_score = db.Column(db.SmallInteger, nullable=False)
+    subcharacteristic = db.relationship("Subcharacteristic", backref="evaluation_details")
 
     __table_args__ = (
         db.CheckConstraint('score BETWEEN 0 AND 3', name='check_score_between_0_and_3'),
     )
-
 
 class QualityCharacteristic(db.Model):
     __tablename__ = 'quality_characteristics'
@@ -231,6 +235,20 @@ class RiskControl(db.Model):
     __table_args__ = (
         CheckConstraint('reduce_likelihood_quadrants BETWEEN 0 AND 2'),
         CheckConstraint('reduce_impact_quadrants BETWEEN 0 AND 2'),
+    )
+    #Es una tabla intermedia para vincular los parametros a un software en especial
+class SoftwareCharacteristic(db.Model):
+    __tablename__ = 'software_characteristics'
+
+    id = db.Column(db.Integer, primary_key=True)
+    software_id = db.Column(db.Integer, db.ForeignKey('software.id', ondelete='CASCADE'), nullable=False)
+    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='CASCADE'), nullable=False)
+
+    software = db.relationship('Software', backref=db.backref('software_characteristics', cascade='all, delete-orphan'))
+    characteristic = db.relationship('QualityCharacteristic', backref=db.backref('software_assignments', cascade='all, delete-orphan'))
+
+    __table_args__ = (
+        db.UniqueConstraint('software_id', 'characteristic_id', name='unique_software_characteristic'),
     )
 
 class ResponseTypeEnum(enum.Enum):
