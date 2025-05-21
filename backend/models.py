@@ -253,5 +253,30 @@ class SoftwareCharacteristic(db.Model):
         db.UniqueConstraint('software_id', 'characteristic_id', name='unique_software_characteristic'),
     )
 
-    """
+class ResponseTypeEnum(enum.Enum):
+    EVITAR = 'Evitar'
+    MITIGAR = 'Mitigar'
+    TRANSFERIR = 'Transferir'
+    ACEPTAR = 'Aceptar'
 
+class RiskMitigation(db.Model):
+    __tablename__ = 'risk_mitigation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    risk_id = db.Column(db.Integer, db.ForeignKey('software_risks.id', ondelete='CASCADE'), nullable=False)
+    evaluation_id = db.Column(db.Integer, db.ForeignKey('risk_evaluation.id', ondelete='CASCADE'))
+    ownership_id = db.Column(db.Integer, db.ForeignKey('risk_ownership.id', ondelete='SET NULL'))
+    risk_code = db.Column(db.String(50))
+    risk_description = db.Column(db.Text)
+    risk_zone = db.Column(db.String(100))
+    responsible = db.Column(db.String(100))
+    phase = db.Column(db.String(100))
+    response_type = db.Column(Enum(ResponseTypeEnum))
+    mitigation_plan = db.Column(db.Text)
+
+    risk = db.relationship('SoftwareRisk', backref=db.backref('mitigations', cascade='all, delete-orphan'))
+    evaluation = db.relationship('RiskEvaluation', backref='mitigation')
+    ownership = db.relationship('RiskOwnership', backref='mitigation')
+
+    def __repr__(self):
+        return f'<RiskMitigation {self.risk_code} - {self.response_type.name}>'
