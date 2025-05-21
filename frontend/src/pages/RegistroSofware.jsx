@@ -26,28 +26,40 @@ export default function RegistroSoftwarePage() {
   }, [user]);
 
   // Función para obtener la lista de software
-  const fetchSoftwareList = async () => {
-    if (!user || !user.id) return;
-    
-    try {
-      // Usa la nueva estructura de URL con el ID de usuario
-      const response = await fetch(`http://localhost:5000/software/${user.id}`, {
-        method: "GET",
-        headers: { 
-          "Authorization": `Bearer ${localStorage.getItem('token')}`
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setSoftwareList(data.software || []);
-      } else {
-        console.error("Error al obtener lista de software");
-      }
-    } catch (error) {
-      console.error("Error de conexión:", error);
-    }
-  };
+const fetchSoftwareList = async () => {
+  if (!user || !user.id) return;
+
+  try {
+    // 1. Trae todos los softwares
+    const allResponse = await fetch(`http://localhost:5000/software/${user.id}`, {
+      headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` },
+    });
+    const allData = await allResponse.json();
+    const allSoftwares = allData.software || [];
+
+    // 2. Trae solo los evaluados
+    const evalResponse = await fetch(`http://localhost:5003/evaluacion/software-evaluados/${user.id}`, {
+      headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` },
+    });
+    const evaluated = await evalResponse.json();
+
+    // 3. Combina los datos
+    const combined = allSoftwares.map(software => {
+      const match = evaluated.find(e => e.software_id === software.id);
+      return {
+        ...software,
+        evaluation_date: match?.evaluation_date || null,
+        evaluation_id: match?.evaluation_id || null,
+        global_percentage: match?.global_percentage || null,
+        result: match?.result || "No evaluado"
+      };
+    });
+
+    setSoftwareList(combined);
+  } catch (error) {
+    console.error("Error al obtener o combinar software:", error);
+  }
+};
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -191,7 +203,7 @@ export default function RegistroSoftwarePage() {
             <th>Nombre del Software</th>
             <th>Versión</th>
             <th>Ciudad</th>
-            <th>Fecha de Registro</th>
+            <th>Fecha de evaluacion</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -207,7 +219,7 @@ export default function RegistroSoftwarePage() {
                 <td>{software.name}</td>
                 <td>{software.version}</td>
                 <td>{software.city}</td>
-                <td>{formatDate(software.registered_at)}</td>
+                <td>{software.evaluation_date || "No evaluado"}</td>
                 <td>
                   <button 
                     className="icon-button view" 

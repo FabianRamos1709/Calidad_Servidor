@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import RegistroSoftwarePage from './pages/RegistroSofware';
 import EvaluacionSoftwarePage from './pages/EvaluacionSoftwarePage';
 import ResultadosEvaluacionPage from './pages/ResultadosEvaluacionPage';
+import TablaREvaluacionPage from './pages/TablaResultaod';
 import { AuthProvider } from './context/authContext';
 import './App.css';
 
@@ -66,7 +67,13 @@ function App() {
                 <EvaluacionSoftwarePage />
               </MainLayout>
             } />
-            {/* Nueva ruta para los resultados de evaluación */}
+            {/* Nueva ruta para los resultados de evaluación             */}
+            <Route path="/resultados" element={
+              <MainLayout>
+                <TablaREvaluacionPage />
+              </MainLayout>
+            } />
+
             <Route path="/resultados/:softwareId/:evaluationId" element={
               <MainLayout>
                 <ResultadosEvaluacionPage />

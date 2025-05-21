@@ -37,10 +37,11 @@ def create_evaluation(data):
                 evaluation_id=evaluation.id,
                 subcharacteristic_id=sub.id,
                 score=score,
-                comment=comment,
-                #subcharacteristic_name=sub.name,
-                #subcharacteristic_description=sub.description,
-                max_score=sub.max_score
+                comment=comment
+                # Removed invalid parameters:
+                # max_score=sub.max_score
+                # subcharacteristic_name=sub.name
+                # subcharacteristic_description=sub.description
             )
             db.session.add(evaluation_detail)
 
@@ -68,9 +69,10 @@ def create_evaluation(data):
                 value=value,
                 max_value=max_value,
                 result_percentage=round(result_percentage, 2),
-                weighted_percentage=round(weighted_percentage, 2),
-                characteristic_name=characteristic.name,
-                weight_percentage=characteristic.weight_percentage
+                weighted_percentage=round(weighted_percentage, 2)
+                # Removed invalid parameters:
+                # characteristic_name=characteristic.name,
+                # weight_percentage=characteristic.weight_percentage
             )
             db.session.add(summary)
             global_score += weighted_percentage
@@ -167,13 +169,14 @@ def get_characteristic_summary_by_software(software_id, evaluation_id):
 
     result = []
     for summary in summaries:
+        characteristic = summary.characteristic
         result.append({
-            'characteristic_name': summary.characteristic_name,  
+            'characteristic_name': characteristic.name,
             'value': summary.value,
             'max_value': summary.max_value,
             'result_percentage': f"{summary.result_percentage:.2f}%",
             'weighted_percentage': f"{summary.weighted_percentage:.2f}%",
-            'max_possible_percentage': f"{summary.weight_percentage:.2f}"  
+            'max_possible_percentage': f"{characteristic.weight_percentage:.2f}"
         })
 
     return {
