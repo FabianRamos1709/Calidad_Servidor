@@ -35,6 +35,8 @@ const LoginPage = () => {
         localStorage.setItem('token', result.token);
         login(result.user); // Guardar datos del usuario
         navigate("/home");
+      }else {
+        alert("Credenciales invalidas")
       }
     } catch (error) {
       console.error("Error de conexión:", error);

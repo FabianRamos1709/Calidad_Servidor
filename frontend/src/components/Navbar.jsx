@@ -67,7 +67,7 @@ export default function Navbar() {
             <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`}>Dashboard</Link>
             <Link to="/sobrenosotros" className={`nav-link ${isActive('/sobrenosotros')}`}>Sobre Nosotros</Link>
             <Link to="/contactenos" className={`nav-link ${isActive('/contactenos')}`}>Contáctenos</Link>
-            <Link to="/evaluacionSof" className={`nav-link ${isActive('/evaluacionSof')}`}>Evolución</Link>
+            <Link to="/software" className={`nav-link ${isActive('/software')}`}>Evolución</Link>
             <Link to="/resultados" className={`nav-link ${isActive('/resultados')}`}>Resultados</Link>
           </div>
           

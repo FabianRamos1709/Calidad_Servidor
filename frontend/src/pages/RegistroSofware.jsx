@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/RegistroSoftwarePage.css";
 import { useAuth } from '../context/authContext';
 
 export default function RegistroSoftwarePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [softwareList, setSoftwareList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -172,6 +174,11 @@ export default function RegistroSoftwarePage() {
     }
   };
 
+  // Función para navegar a la página de evaluación
+  const handleEvaluateSoftware = (softwareId) => {
+    navigate(`/software/evaluar/${softwareId}`);
+  };
+
   return (
     <div className="registro-container">
       <h1 className="title">Registro de Software</h1>
@@ -209,7 +216,12 @@ export default function RegistroSoftwarePage() {
                     Ver Detalles
                   </button>
                   <button className="icon-button edit">Editar</button>
-                  <button className="icon-button evaluate">Evaluar</button>
+                  <button 
+                    className="icon-button evaluate"
+                    onClick={() => handleEvaluateSoftware(software.id)}
+                  >
+                    Evaluar
+                  </button>
                 </td>
               </tr>
             ))

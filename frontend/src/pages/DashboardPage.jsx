@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import '../styles/DashboardPage.css';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/authContext';
-
+import '../styles/DashboardPage.css';
 export default function DashboardPage() {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -10,12 +9,9 @@ export default function DashboardPage() {
   const [editMode, setEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [expandedSubIndices, setExpandedSubIndices] = useState([]);
-  const [softwares, setSoftwares] = useState([]);
-  const [selectedSoftwareId, setSelectedSoftwareId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    software_id: '',
     name: '',
     description: '',
     weight_percentage: '',
@@ -27,56 +23,33 @@ export default function DashboardPage() {
     description: ''
   });
 
-  useEffect(() => {
-    if (user && user.id) {
-      setIsLoading(true);
-      fetch(`http://localhost:5000/software/${user.id}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-        .then(res => res.json())
-        .then(data => {
-          setSoftwares(data.software || []);
-          setSelectedSoftwareId(null); // No seleccionar por defecto
-          setIsLoading(false);
+  const loadCharacteristics = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:5002/modelo/caracteristica");
+      const data = await res.json();
+      const enriched = await Promise.all(
+        data.map(async (char) => {
+          const subRes = await fetch(`http://localhost:5002/modelo/caracteristica/${char.id}`);
+          const subData = await subRes.json();
+          return { ...char, subcharacteristics: subData.subcharacteristics || [] };
         })
-        .catch(err => {
-          console.error("Error al cargar softwares:", err);
-          setIsLoading(false);
-        });
+      );
+      setItems(enriched);
+    } catch (error) {
+      console.error("Error cargando características:", error);
+      setItems([]);
+    } finally {
+      setIsLoading(false);
     }
-  }, [user]);
+  };
 
-  // Cargar ítems cuando se selecciona un software
   useEffect(() => {
-    if (selectedSoftwareId) {
-      setIsLoading(true);
-      fetch(`http://localhost:5002/modelo/items_por_software/${selectedSoftwareId}`)
-        .then(res => res.json())
-        .then(data => {
-          setItems(data.items || []);
-          setIsLoading(false);
-        })
-        .catch(err => {
-          console.error("Error al cargar ítems del software:", err);
-          setItems([]);
-          setIsLoading(false);
-        });
-    } else {
-      setItems([]); // Limpiar si no hay software seleccionado
-    }
-  }, [selectedSoftwareId]);
+    loadCharacteristics();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSoftwareSelect = (e) => {
-    const softwareId = parseInt(e.target.value);
-    setSelectedSoftwareId(softwareId);
-    setFormData({ ...formData, software_id: softwareId });
   };
 
   const handleSubcaracteristicaChange = e => {
@@ -94,29 +67,22 @@ export default function DashboardPage() {
   };
 
   const removeSubcaracteristica = (index) => {
-    const updatedSubs = [...formData.subcharacteristics];
-    updatedSubs.splice(index, 1);
-    setFormData({
-      ...formData,
-      subcharacteristics: updatedSubs
-    });
+    const updated = [...formData.subcharacteristics];
+    updated.splice(index, 1);
+    setFormData({ ...formData, subcharacteristics: updated });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.software_id) {
-      alert("Por favor selecciona un software.");
+    if (formData.subcharacteristics.length === 0) {
+      alert("Debes agregar al menos una subcaracterística.");
       return;
     }
-    
     setIsLoading(true);
-    
     try {
       const res = await fetch("http://localhost:5002/modelo/caracteristica", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
@@ -124,38 +90,81 @@ export default function DashboardPage() {
           subcharacteristics: formData.subcharacteristics
         })
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        const assignRes = await fetch("http://localhost:5002/modelo/asignar_item", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            software_id: formData.software_id,
-            characteristics: [data.characteristic_id]
-          })
-        });
-
-        if (assignRes.ok) {
-          alert("Item registrado y asignado correctamente.");
-
-          // Volver a cargar los ítems desde el backend
-          const updatedItemsRes = await fetch(`http://localhost:5002/modelo/items_por_software/${formData.software_id}`);
-          const updatedItemsData = await updatedItemsRes.json();
-          setItems(updatedItemsData.items || []);
-
-          resetForm();
-        }
-        else {
-          alert("Error al asignar ítem al software.");
-        }
+        alert("Item creado correctamente");
+        resetForm();
+        loadCharacteristics();
       } else {
-        alert(data.error || "Error al registrar ítem.");
+        alert(data.error || "Error al crear item");
       }
     } catch (error) {
+      alert("Error al conectar con el servidor");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("¿Eliminar esta característica?")) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        alert("Item eliminado correctamente");
+        loadCharacteristics();
+      } else {
+        alert("Error al eliminar el item");
+      }
+    } catch (err) {
+      alert("Error al conectar con el servidor");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = async (item) => {
+    setEditMode(true);
+    setEditItem(item);
+    try {
+      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${item.id}`);
+      const data = await res.json();
+      setFormData({
+        name: data.name,
+        description: data.description,
+        weight_percentage: data.weight_percentage,
+        subcharacteristics: data.subcharacteristics || []
+      });
+      setShowModal(true);
+    } catch (err) {
+      alert("Error al cargar datos del item");
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!editItem) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${editItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          weight_percentage: parseFloat(formData.weight_percentage),
+          subcharacteristics: formData.subcharacteristics
+        })
+      });
+      if (res.ok) {
+        alert("Item actualizado correctamente");
+        resetForm();
+        loadCharacteristics();
+      } else {
+        const errData = await res.json();
+        alert(errData.message || "Error al actualizar");
+      }
+    } catch (err) {
       alert("Error al conectar con el servidor");
     } finally {
       setIsLoading(false);
@@ -167,7 +176,6 @@ export default function DashboardPage() {
     setEditMode(false);
     setEditItem(null);
     setFormData({
-      software_id: selectedSoftwareId || '',
       name: '',
       description: '',
       weight_percentage: '',
@@ -175,134 +183,16 @@ export default function DashboardPage() {
     });
   };
 
-  const handleDelete = async (itemId) => {
-    if (!confirm("¿Estás seguro de eliminar este ítem?")) return;
-    
-    setIsLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${itemId}`, {
-        method: "DELETE"
-      });
-      
-      if (res.ok) {
-        // Recargar los ítems después de eliminar
-        const updatedItemsRes = await fetch(`http://localhost:5002/modelo/items_por_software/${selectedSoftwareId}`);
-        const updatedItemsData = await updatedItemsRes.json();
-        setItems(updatedItemsData.items || []);
-        alert("Item eliminado correctamente");
-      } else {
-        alert("Error al eliminar el ítem");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error al conectar con el servidor");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEdit = async (item) => {
-    setEditMode(true);
-    setEditItem(item);
-    
-    try {
-      // Obtener detalles completos del ítem
-      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${item.id}`);
-      const itemData = await res.json();
-      
-      setFormData({
-        software_id: selectedSoftwareId,
-        name: itemData.name,
-        description: itemData.description,
-        weight_percentage: itemData.weight_percentage,
-        subcharacteristics: itemData.subcharacteristics || []
-      });
-      
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error al cargar detalles del ítem:", error);
-      alert("Error al cargar detalles del ítem");
-    }
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    if (!editItem) return;
-    
-    setIsLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5002/modelo/caracteristica/${editItem.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          weight_percentage: parseFloat(formData.weight_percentage),
-          subcharacteristics: formData.subcharacteristics
-        })
-      });
-
-      if (res.ok) {
-        // Recargar los ítems
-        const updatedItemsRes = await fetch(`http://localhost:5002/modelo/items_por_software/${selectedSoftwareId}`);
-        const updatedItemsData = await updatedItemsRes.json();
-        setItems(updatedItemsData.items || []);
-        
-        resetForm();
-        alert("Item actualizado correctamente");
-      } else {
-        const errorData = await res.json();
-        alert(errorData.message || "Error al actualizar el ítem");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error al conectar con el servidor");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="dashboard-container">
       <h1 className="title">ISO/IEC 25010</h1>
-      <div className="filter-section">
-        <label>Filtrar por software:</label>
-        <select value={selectedSoftwareId || ''} onChange={handleSoftwareSelect}>
-          <option value="">Seleccione un software</option>
-          {softwares.map(sw => (
-            <option key={sw.id} value={sw.id}>{sw.name}</option>
-          ))}
-        </select>
-      </div>
-      
-      {selectedSoftwareId && (
-        <button 
-          className="add-button" 
-          onClick={() => {
-            setEditMode(false);
-            setFormData({
-              software_id: selectedSoftwareId,
-              name: '',
-              description: '',
-              weight_percentage: '',
-              subcharacteristics: []
-            });
-            setShowModal(true);
-          }}
-        >
-          Agregar Nuevo Item
-        </button>
-      )}
-
+      <button className="add-button" onClick={() => setShowModal(true)}>Agregar nuevo ítem</button>
       {isLoading ? (
         <div className="loading">Cargando...</div>
       ) : (
         <table className="item-table">
           <thead>
             <tr>
-              <th>SOFTWARE</th>
               <th>ITEM</th>
               <th>DESCRIPCIÓN</th>
               <th>SUBCARACTERÍSTICAS</th>
@@ -311,21 +201,18 @@ export default function DashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {!selectedSoftwareId ? (
-              <tr><td colSpan="6">Seleccione un software para ver sus ítems</td></tr>
-            ) : items.length === 0 ? (
-              <tr><td colSpan="6">No hay ítems registrados para este software.</td></tr>
+            {items.length === 0 ? (
+              <tr><td colSpan="5">No hay ítems registrados.</td></tr>
             ) : (
               items.map((item) => (
                 <tr key={item.id}>
-                  <td>{softwares.find(s => s.id === item.software_id)?.name || "N/A"}</td>
                   <td>{item.name}</td>
                   <td>{item.description}</td>
                   <td>{item.subcharacteristics.length}</td>
                   <td>{item.weight_percentage}%</td>
                   <td>
-                    <button className="icon-button" onClick={() => handleEdit(item)}><Pencil size={15} /></button>
-                    <button className="icon-button" onClick={() => handleDelete(item.id)}><Trash2 size={15} /></button>
+                    <button onClick={() => handleEdit(item)}><Pencil size={15} /></button>
+                    <button onClick={() => handleDelete(item.id)}><Trash2 size={15} /></button>
                   </td>
                 </tr>
               ))
@@ -337,44 +224,39 @@ export default function DashboardPage() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2 className="modal-title">{editMode ? 'Editar Item' : 'Nuevo Item'}</h2>
+            <h2 className="modal-title">{editMode ? 'Editar Ítem' : 'Nuevo Ítem'}</h2>
             <form onSubmit={editMode ? handleUpdate : handleSubmit}>
               <div className="form-group">
-                <label>Software</label>
-                <select 
-                  name="software_id" 
-                  value={formData.software_id} 
-                  onChange={handleSoftwareSelect} 
-                  required
-                  disabled={editMode} // No permitir cambiar el software al editar
-                >
-                  <option value="">Seleccione un software</option>
-                  {softwares.map(sw => (
-                    <option key={sw.id} value={sw.id}>{sw.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
                 <label>Nombre del ítem</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label>Descripción</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} required />
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label>Peso (%)</label>
-                <input 
-                  type="number" 
-                  name="weight_percentage" 
-                  value={formData.weight_percentage} 
-                  onChange={handleChange} 
-                  min="1" 
-                  max="100" 
-                  required 
+                <input
+                  type="number"
+                  name="weight_percentage"
+                  value={formData.weight_percentage}
+                  onChange={handleChange}
+                  min="1"
+                  max="100"
+                  required
                 />
               </div>
 
@@ -396,8 +278,8 @@ export default function DashboardPage() {
                           <label>Descripción</label>
                           <input type="text" value={sub.description} readOnly />
                         </div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="remove-sub-button"
                           onClick={() => removeSubcaracteristica(idx)}
                         >
@@ -407,24 +289,25 @@ export default function DashboardPage() {
                     )}
                   </div>
                 ))}
+
                 <div className="subcaracteristica-form">
-                  <input 
-                    type="text" 
-                    name="name" 
-                    value={newSubcaracteristica.name} 
-                    onChange={handleSubcaracteristicaChange} 
-                    placeholder="Nombre" 
+                  <input
+                    type="text"
+                    name="name"
+                    value={newSubcaracteristica.name}
+                    onChange={handleSubcaracteristicaChange}
+                    placeholder="Nombre"
                   />
-                  <input 
-                    type="text" 
-                    name="description" 
-                    value={newSubcaracteristica.description} 
-                    onChange={handleSubcaracteristicaChange} 
-                    placeholder="Descripción" 
+                  <input
+                    type="text"
+                    name="description"
+                    value={newSubcaracteristica.description}
+                    onChange={handleSubcaracteristicaChange}
+                    placeholder="Descripción"
                   />
-                  <button 
-                    type="button" 
-                    className="add-sub-button" 
+                  <button
+                    type="button"
+                    className="add-sub-button"
                     onClick={addSubcaracteristica}
                   >
                     Agregar Subcaracterística
@@ -435,13 +318,14 @@ export default function DashboardPage() {
               <div className="modal-actions">
                 <button type="button" className="cancel-button" onClick={resetForm}>Cancelar</button>
                 <button type="submit" className="add-item-button" disabled={isLoading}>
-                  {isLoading ? 'Procesando...' : (editMode ? 'Guardar Cambios' : 'Agregar Item')}
+                  {isLoading ? 'Procesando...' : (editMode ? 'Guardar Cambios' : 'Agregar Ítem')}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 }

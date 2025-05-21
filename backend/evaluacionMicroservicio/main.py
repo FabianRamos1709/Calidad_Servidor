@@ -8,15 +8,29 @@ from flask_jwt_extended import JWTManager
 from backend.config import Config
 from backend.models import db
 from app.routes import evaluation_routes
-
+from flask_cors import CORS 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+
+    app.config['CORS_HEADERS'] = 'Content-Type,Authorization'
+    
+    # Aplicar CORS antes de registrar rutas
+    CORS(app, 
+         resources={r"/*": {
+            "origins": ["http://localhost:5173"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+         }}, 
+         supports_credentials=True)
 
     db.init_app(app)
     JWTManager(app)
     with app.app_context():
         db.create_all() 
+
+   
 
     app.register_blueprint(evaluation_routes, url_prefix='/evaluacion')
     return app

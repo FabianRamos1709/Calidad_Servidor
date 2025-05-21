@@ -236,7 +236,9 @@ class RiskControl(db.Model):
         CheckConstraint('reduce_likelihood_quadrants BETWEEN 0 AND 2'),
         CheckConstraint('reduce_impact_quadrants BETWEEN 0 AND 2'),
     )
-    #Es una tabla intermedia para vincular los parametros a un software en especial
+    
+    """
+        #Es una tabla intermedia para vincular los parametros a un software en especial
 class SoftwareCharacteristic(db.Model):
     __tablename__ = 'software_characteristics'
 
@@ -250,4 +252,6 @@ class SoftwareCharacteristic(db.Model):
     __table_args__ = (
         db.UniqueConstraint('software_id', 'characteristic_id', name='unique_software_characteristic'),
     )
+
+    """
 

@@ -38,8 +38,8 @@ def create_evaluation(data):
                 subcharacteristic_id=sub.id,
                 score=score,
                 comment=comment,
-                subcharacteristic_name=sub.name,
-                subcharacteristic_description=sub.description,
+                #subcharacteristic_name=sub.name,
+                #subcharacteristic_description=sub.description,
                 max_score=sub.max_score
             )
             db.session.add(evaluation_detail)
@@ -181,3 +181,21 @@ def get_characteristic_summary_by_software(software_id, evaluation_id):
         'software_id': software_id,
         'summaries': result
     }
+"""
+def prepare_initial_evaluation_data(characteristicsData):
+    initialEvaluationData = {
+        'details': []
+    }
+
+    for char in characteristicsData:
+        for sub in char['subcharacteristics']:
+            initialEvaluationData['details'].append({
+                'characteristic_id': char['id'],
+                'characteristic_percentage': char['weight_percentage'],
+                'subcharacteristic_id': sub['id'],
+                'score': 0,
+                'comment': ''
+            })
+
+    return initialEvaluationData
+"""

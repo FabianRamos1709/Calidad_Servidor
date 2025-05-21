@@ -7,8 +7,7 @@ from app.services import (
     update_characteristic_with_subs,
     delete_characteristic,
     delete_subcharacteristic,
-    assign_characteristics_to_software,
-    get_items_by_software
+    get_all_characteristics_with_subs
 )
 
 
@@ -91,7 +90,7 @@ def delete_sub(id):
 
 
 #misma monda, para lo del software y los items
-
+"""
 @modelo_routes.route('/asignar_item', methods=['POST'])
 def asignar_item_a_software():
     data = request.get_json()
@@ -104,9 +103,10 @@ def asignar_item_a_software():
     result = assign_characteristics_to_software(software_id, characteristic_ids)
     status_code = 200 if result['success'] else 400
     return jsonify(result), status_code
+"""
 
 
-@modelo_routes.route('/items_por_software/<int:software_id>', methods=['GET'])
-def obtener_items_de_software(software_id):
-    result = get_items_by_software(software_id)
-    return jsonify({'items': result}), 200
+@modelo_routes.route('/caracteristicas-con-subcaracteristicas', methods=['GET'])
+def get_all_with_subs():
+    data = get_all_characteristics_with_subs()
+    return jsonify(data), 200

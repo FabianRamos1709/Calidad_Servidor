@@ -32,6 +32,13 @@ def create_software_with_participants(name, city, general_objective, description
     db.session.commit()
     return {'success': True, 'message': 'Software registrado', 'software': new_software.to_dict()}
 
+def get_software_detail(user_id, software_id):
+    software = Software.query.filter_by(id=software_id, user_id=user_id).first()
+    if not software:
+        return None
+    return software.to_dict()
+
+
 """
 def get_software_by_user(user_id):
     softwares = Software.query.filter_by(user_id=user_id).options(

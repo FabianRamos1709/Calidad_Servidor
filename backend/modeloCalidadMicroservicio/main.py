@@ -18,7 +18,8 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all() 
-    CORS(app, origins="http://localhost:5173", supports_credentials=True)
+        
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
     app.register_blueprint(modelo_routes, url_prefix='/modelo')
     return app
 

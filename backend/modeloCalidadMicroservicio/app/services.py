@@ -125,15 +125,15 @@ def delete_subcharacteristic(sub_id):
 
 #para asignar vincular los items y subcaracteristicas a un software
 
-def assign_characteristics_to_software(software_id, characteristic_ids):
-    from backend.models import Software, QualityCharacteristic, SoftwareCharacteristic
+"""def assign_characteristics_to_software(software_id, characteristic_ids):
+    from backend.models import Software, QualityCharacteristic
 
     software = Software.query.get(software_id)
     if not software:
         return {'success': False, 'message': 'Software no encontrado'}
 
     # Obtener las características ya asignadas
-    existing_assignments = SoftwareCharacteristic.query.filter_by(software_id=software_id).all()
+    existing_assignments = QualityCharacteristic.query.filter_by(software_id=software_id).all()
     existing_char_ids = [assign.characteristic_id for assign in existing_assignments]
     
     # Calcular características totales (existentes + nuevas)
@@ -153,7 +153,7 @@ def assign_characteristics_to_software(software_id, characteristic_ids):
             
         # Verificar si ya existe esta asignación
         if cid not in existing_char_ids:
-            db.session.add(SoftwareCharacteristic(software_id=software_id, characteristic_id=cid))
+            db.session.add(QualityCharacteristic(software_id=software_id, characteristic_id=cid))
 
     db.session.commit()
     return {'success': True, 'message': 'Características asignadas correctamente'}
@@ -184,4 +184,27 @@ def get_items_by_software(software_id):
             'subcharacteristics': subcaracs
         })
 
+    return result
+"""
+def get_all_characteristics_with_subs():
+    characteristics = QualityCharacteristic.query.all()
+    result = []
+
+    for char in characteristics:
+        subs = Subcharacteristic.query.filter_by(characteristic_id=char.id).all()
+        result.append({
+            'id': char.id,
+            'name': char.name,
+            'description': char.description,
+            'weight_percentage': float(char.weight_percentage),
+            'subcharacteristics': [
+                {
+                    'id': sub.id,
+                    'name': sub.name,
+                    'description': sub.description,
+                    'max_score': sub.max_score
+                }
+                for sub in subs
+            ]
+        })
     return result

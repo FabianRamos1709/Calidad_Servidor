@@ -22,7 +22,7 @@ def create_app():
         db.create_all() 
     #Migrate(app, db)  
 
-    CORS(app, resources={r"/software/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
     app.register_blueprint(software_routes, url_prefix='/software')
     return app
