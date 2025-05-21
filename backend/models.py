@@ -252,7 +252,7 @@ class SoftwareCharacteristic(db.Model):
     __table_args__ = (
         db.UniqueConstraint('software_id', 'characteristic_id', name='unique_software_characteristic'),
     )
-
+ """
 class ResponseTypeEnum(enum.Enum):
     EVITAR = 'Evitar'
     MITIGAR = 'Mitigar'
