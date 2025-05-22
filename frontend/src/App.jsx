@@ -11,6 +11,8 @@ import EvaluacionSoftwarePage from './pages/EvaluacionSoftwarePage';
 import ResultadosEvaluacionPage from './pages/ResultadosEvaluacionPage';
 import TablaREvaluacionPage from './pages/TablaResultaod';
 import { AuthProvider } from './context/authContext';
+import RegistroRiesgoPage from './pages/RegistroRiesgoPage';
+
 import './App.css';
 
 function App() {
@@ -34,7 +36,6 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
   };
-
 
   return (
     <AuthProvider>
@@ -61,13 +62,29 @@ function App() {
                 <RegistroSoftwarePage />
               </MainLayout>
             } />
-            {/* Nueva ruta para la evaluación de software */}
+            
+            {/* Ruta para la evaluación de software */}
             <Route path="/software/evaluar/:softwareId" element={
               <MainLayout>
                 <EvaluacionSoftwarePage />
               </MainLayout>
             } />
-            {/* Nueva ruta para los resultados de evaluación             */}
+            
+            {/* Ruta para el registro de riesgo con parámetro de software */}
+            <Route path="/riesgos/registrar/:softwareId" element={
+              <MainLayout>
+                <RegistroRiesgoPage />
+              </MainLayout>
+            } />
+            
+            {/* Ruta para el registro de riesgo sin parámetro (deprecada) */}
+            <Route path="/nose" element={
+              <MainLayout>
+                <RegistroRiesgoPage />
+              </MainLayout>
+            } />
+            
+            {/* Ruta para los resultados de evaluación */}
             <Route path="/resultados" element={
               <MainLayout>
                 <TablaREvaluacionPage />
@@ -79,6 +96,7 @@ function App() {
                 <ResultadosEvaluacionPage />
               </MainLayout>
             } />
+            
             {/* Redirección de la ruta raíz a login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             

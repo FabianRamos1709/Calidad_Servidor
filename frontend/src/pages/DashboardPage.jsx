@@ -211,8 +211,8 @@ export default function DashboardPage() {
                   <td>{item.subcharacteristics.length}</td>
                   <td>{item.weight_percentage}%</td>
                   <td>
-                    <button onClick={() => handleEdit(item)}><Pencil size={15} /></button>
-                    <button onClick={() => handleDelete(item.id)}><Trash2 size={15} /></button>
+                    <button className='btn' onClick={() => handleEdit(item)}><Pencil size={15} /></button>
+                    <button className="btn" onClick={() => handleDelete(item.id)}><Trash2 size={15} /></button>
                   </td>
                 </tr>
               ))

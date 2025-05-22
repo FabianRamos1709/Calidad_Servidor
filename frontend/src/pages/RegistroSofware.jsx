@@ -7,6 +7,8 @@ export default function RegistroSoftwarePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [softwareList, setSoftwareList] = useState([]);
+  const [showEvaluationModal, setShowEvaluationModal] = useState(false);
+  const [selectedSoftwareId, setSelectedSoftwareId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     city: "",
@@ -188,7 +190,8 @@ const fetchSoftwareList = async () => {
 
   // Función para navegar a la página de evaluación
   const handleEvaluateSoftware = (softwareId) => {
-    navigate(`/software/evaluar/${softwareId}`);
+    setSelectedSoftwareId(softwareId);
+    setShowEvaluationModal(true);
   };
 
   return (
@@ -313,6 +316,41 @@ const fetchSoftwareList = async () => {
           </div>
         </div>
       )}
+      {showEvaluationModal && (
+        <div className="modal-overlay-pre">
+          <div className="modal-pre">
+            <h2 className="modal-title-pre">¿Qué desea evaluar?</h2>
+            <p>Seleccione una opción:</p>
+            <div className="modal-actions-pre">
+              <button 
+                className="add-item-button-pre"
+                onClick={() => {
+                  setShowEvaluationModal(false);
+                  navigate(`/riesgos/registrar/${selectedSoftwareId}`);
+                }}
+              >
+                Matriz de Riesgos
+              </button>
+              <button 
+                className="add-item-button-pre"
+                onClick={() => {
+                  setShowEvaluationModal(false);
+                  navigate(`/software/evaluar/${selectedSoftwareId}`);
+                }}
+              >
+                Evaluación de Calidad
+              </button>
+              <button 
+                className="cancel-button-pre"
+                onClick={() => setShowEvaluationModal(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    
   );
 }

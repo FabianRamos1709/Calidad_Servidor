@@ -1,8 +1,9 @@
 .dashboard-container {
-  background-color: #05010d;
+  background-color: #1a1f25;
   color: white;
   padding: 30px;
   min-height: 100vh;
+  border-radius: 16px;
 }
 
 .title {
@@ -161,7 +162,7 @@
 
 .highlighted {
   color: #a2ff00;
-  background-color: #333;
+  background-color: #df0404;
 }
 
 .subcaracteristica-details {
@@ -190,4 +191,22 @@
 
 .toggle-icon {
   font-size: 12px;
+}
+.btn{
+  background-color: #1a1f25;
+  color: white;
+  border: none;
+  margin: 3px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block
+  
+
+}
+
+.btn:hover{
+  background-color: #a2ff00;
+  color: rgb(0, 0, 0);
 }
