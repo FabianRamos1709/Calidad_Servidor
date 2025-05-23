@@ -1,79 +1,59 @@
-/* Resultado general */
-.resultados-container {
+.riesgo-detalle-container {
   padding: 2rem;
   background-color: #1a1f25;
   color: #ffffff;
   min-height: 100vh;
 }
 
-.resultados-header h1 {
+.riesgo-detalle-container h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
-.resultados-header h2 {
-  font-size: 1.4rem;
+.riesgo-detalle-container h2 {
+  font-size: 1.3rem;
   color: #ccc;
   margin-top: 0;
+  margin-bottom: 2rem;
 }
 
-.global-score {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  margin: 2rem 0;
-}
-
-.score-circle {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.score-info h3 {
-  margin: 0;
-}
-
-.characteristics-results {
-  margin-top: 2rem;
-}
-
-.results-grid {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #333;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 1rem;
-}
-
-.results-header-row,
-.result-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 1rem;
+.riesgo-resumen,
+.riesgo-clasificacion,
+.riesgo-evaluacion,
+.riesgo-controles {
   background-color: #2a2f38;
-  border-bottom: 1px solid #444;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
-.results-header-row {
-  font-weight: bold;
-  background-color: #333;
+.riesgo-resumen h3,
+.riesgo-clasificacion h3,
+.riesgo-evaluacion h3,
+.riesgo-controles h3 {
+  color: #00bcd4;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
 }
 
-.result-cell {
-  text-align: center;
+.riesgo-resumen p,
+.riesgo-clasificacion p,
+.riesgo-evaluacion p,
+.riesgo-controles p {
+  margin: 0.4rem 0;
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.results-actions {
+.riesgo-resumen strong,
+.riesgo-clasificacion strong,
+.riesgo-evaluacion strong,
+.riesgo-controles strong {
+  color: #ffd700;
+}
+
+.resultados-actions {
   margin-top: 2rem;
   text-align: center;
 }
@@ -92,4 +72,20 @@
 
 .action-button:hover {
   background-color: #004d99;
+}
+
+.print-button {
+  background-color: #28a745;
+}
+
+.print-button:hover {
+  background-color: #1e7e34;
+}
+
+.loading,
+.error-message {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  color: #f44336;
 }
