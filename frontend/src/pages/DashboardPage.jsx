@@ -226,7 +226,7 @@ export default function DashboardPage() {
           <div className="modal">
             <h2 className="modal-title">{editMode ? 'Editar Ítem' : 'Nuevo Ítem'}</h2>
             <form onSubmit={editMode ? handleUpdate : handleSubmit}>
-              <div className="form-group">
+              <div className="form-group-da">
                 <label>Nombre del ítem</label>
                 <input
                   type="text"
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-da">
                 <label>Descripción</label>
                 <textarea
                   name="description"
@@ -247,7 +247,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-da">
                 <label>Peso (%)</label>
                 <input
                   type="number"
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-da">
                 <label>Subcaracterísticas ({formData.subcharacteristics.length})</label>
                 {formData.subcharacteristics.map((sub, idx) => (
                   <div key={idx} className="subcaracteristica-item">
@@ -270,11 +270,11 @@ export default function DashboardPage() {
                     </div>
                     {expandedSubIndices.includes(idx) && (
                       <div className="subcaracteristica-details">
-                        <div className="form-group">
+                        <div className="form-group-da">
                           <label>Nombre</label>
                           <input type="text" value={sub.name} readOnly />
                         </div>
-                        <div className="form-group">
+                        <div className="form-group-da">
                           <label>Descripción</label>
                           <input type="text" value={sub.description} readOnly />
                         </div>

@@ -62,15 +62,3 @@ button {
   margin: 0 auto;
   padding: 0 16px;
 }
-
-/* Modo oscuro */
-body.dark-theme {
-  background-color: var(--dark-bg);
-  color: var(--light-text);
-}
-
-/* Modo claro */
-body:not(.dark-theme) {
-  background-color: var(--light-bg);
-  color: var(--dark-text);
-}

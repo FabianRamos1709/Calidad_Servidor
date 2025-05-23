@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext, useRef } from 'react';
 import { User, Menu, X } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeContext } from '../context/ThemeContext';
 import '../styles/Navbar.css';
 import { useAuth } from '../context/authContext'
 
@@ -10,7 +9,6 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { darkMode } = useContext(ThemeContext);
   const userMenuRef = useRef(null);
   const { user, logout } = useAuth();
   // Cerrar el menú cuando el ancho de la ventana cambia a más de 1024px
@@ -59,7 +57,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar ${darkMode ? 'navbar-dark' : ''}`}>
+      <nav className="navbar">
         <div className="nav-container">
           
           <div className="nav-links desktop-menu">
@@ -101,7 +99,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <div className={`mobile-menu ${menuOpen ? 'mobile-menu-open' : ''} ${darkMode ? 'mobile-menu-dark' : ''}`}>
+      <div className={`mobile-menu ${menuOpen ? 'mobile-menu-open' : ''}`}>
         <div className="mobile-nav-links">
           <Link to="/home" className={`mobile-menu-link ${isActive('/home')}`}>Home</Link>
           <Link to="/dashboard" className={`mobile-menu-link ${isActive('/dashboard')}`}>Dashboard</Link>

@@ -1,9 +1,13 @@
+/* Fondo general para toda la vista */
 .login-container {
   display: flex;
-  height: 90vh;
+  height: 100vh;
   overflow: hidden;
+  border-radius: 8px;
+
 }
 
+/* Lado izquierdo: imagen + texto de marca */
 .login-left {
   width: 45%;
   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('../assets/tech-background.svg');
@@ -30,12 +34,15 @@
 .login-left h1 {
   font-size: 3rem;
   margin-bottom: 1.5rem;
+  background-color: transparent;
 }
+
 .login-left p {
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
+/* Lado derecho: formulario */
 .login-right {
   width: 55%;
   display: flex;
@@ -43,24 +50,16 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background-color: var(--background-light);
-  color: var(--text-light);
-}
-
-.theme-toggle-container {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
+  background-color: #1d232a; /* Contenedor más claro que el fondo */
+  color: #e0e0e0;
 }
 
 .login-form-container {
-  flex: 1;
+  width: 100%;
+  max-width: 450px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 450px;
-  margin: 0 auto;
-  width: 100%;
 }
 
 .login-form-container h2 {
@@ -69,11 +68,60 @@
   text-align: left;
 }
 
+/* Campos del formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+.form-group-lo label  {
+  display: block;
+  margin: 0.5rem;
+  font-size: 0.9rem;
+  color: #cecece;
+  text-align: left;
+  font-weight: 500;
+}
+
+.form-group-lo input,
+.form-group-lo textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2c2f36;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.form-group-lo input:focus,
+.form-group-lo textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Botón principal */
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4ADE80;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #157237;
+}
+
+/* Otros enlaces */
 .forgot-password {
   display: block;
   text-align: right;
   margin-top: 0.5rem;
-  color: var(--primary-color);
+  color: #4CAF50;
   font-size: 0.9rem;
   text-decoration: none;
 }
@@ -85,19 +133,13 @@
 }
 
 .register-prompt a {
-  color: var(--primary-color);
+  color: #4CAF50;
   text-decoration: none;
   margin-left: 0.5rem;
   font-weight: bold;
 }
 
-/* Modo oscuro */
-.login-container.dark-mode .login-right {
-  background-color: var(--background-dark);
-  color: var(--text-dark);
-}
-
-/* Responsivo */
+/* Responsive */
 @media (max-width: 768px) {
   .login-container {
     flex-direction: column;
@@ -111,6 +153,7 @@
   .login-left {
     height: 30vh;
     min-height: 250px;
+    justify-content: center;
   }
 
   .login-form-container {

@@ -35,7 +35,7 @@
 }
 
 .nav-link:hover {
-  color: #4ADE80; /* Color verde claro */
+  color: #218b48; /* Color verde claro */
 }
 
 .nav-link.active {
@@ -92,19 +92,12 @@
   overflow: hidden;
 }
 
-.navbar-dark .user-dropdown {
-  background-color: #222;
-  color: #fff;
-}
 
 .user-info {
   padding: 16px;
   border-bottom: 1px solid #eee;
 }
 
-.navbar-dark .user-info {
-  border-bottom: 1px solid #444;
-}
 
 .user-name {
   display: block;
@@ -113,18 +106,11 @@
   color: #333;
 }
 
-.navbar-dark .user-name {
-  color: #fff;
-}
 
 .user-email {
   display: block;
   font-size: 0.85rem;
   color: #666;
-}
-
-.navbar-dark .user-email {
-  color: #aaa;
 }
 
 .dropdown-item {
@@ -135,19 +121,12 @@
   transition: background-color 0.3s ease;
 }
 
-.navbar-dark .dropdown-item {
-  color: #fff;
-}
 
 .dropdown-item:hover {
   background-color: #f5f5f5;
   color: #4ADE80;
 }
 
-.navbar-dark .dropdown-item:hover {
-  background-color: #333;
-  color: #4ADE80;
-}
 
 .dropdown-divider {
   height: 1px;
@@ -155,9 +134,6 @@
   margin: 0;
 }
 
-.navbar-dark .dropdown-divider {
-  background-color: #444;
-}
 
 .logout-item {
   border: none;
@@ -178,10 +154,6 @@
   color: #dc3545;
 }
 
-.navbar-dark .logout-item:hover {
-  background-color: #3a2a2a;
-  color: #f77;
-}
 
 /* Menú móvil */
 .mobile-menu {

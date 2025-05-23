@@ -249,32 +249,32 @@ const fetchSoftwareList = async () => {
           <div className="modal">
             <h2 className="modal-title">Registrar Nuevo Software</h2>
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Ciudad</label>
                 <input type="text" name="city" value={formData.city} onChange={handleChange} required />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Nombre del Software</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Versión del Software</label>
                 <input type="text" name="version" value={formData.version} onChange={handleChange} required />
               </div>
 
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Objetivo General</label>
                 <textarea name="general_objective" value={formData.general_objective} onChange={handleChange} required />
               </div>
               
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Descripción</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} required />
               </div>
               
-              <div className="form-group">
+              <div className="form-group-so">
                 <label>Participantes</label>
                 {formData.participants.length === 0 ? (
                   <p className="no-participants">No hay participantes agregados</p>

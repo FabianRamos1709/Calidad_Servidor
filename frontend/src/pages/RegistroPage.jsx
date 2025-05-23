@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import { ThemeContext } from '../context/ThemeContext';
 import '../styles/RegistroPage.css';
 import { Link } from 'react-router-dom';
 import '../styles/global.css';
@@ -16,7 +15,6 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [registrationError, setRegistrationError] = useState(''); // Nuevo estado para errores de registro
-  const { darkMode } = useContext(ThemeContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,13 +85,13 @@ const RegisterPage = () => {
     }
   };
   return (
-    <div className={`login-container register-layout ${darkMode ? 'dark-mode' : ''}`}>
+    <div className="login-container">
       <div className="login-right">
         <div className="login-form-container">
           <h2>Crear Cuenta</h2>
 
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="email">Correo electrónico</label>
               <input
                 type="email"
@@ -105,7 +103,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="username">Usuario</label>
               <input
                 type="text"
@@ -117,7 +115,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="password">Contraseña</label>
               <div className="password-input-container">
                 <input
@@ -138,7 +136,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="confirmPassword">Confirmar Contraseña</label>
               <input
                 type={showPassword ? "text" : "password"}

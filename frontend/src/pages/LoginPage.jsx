@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import { ThemeContext } from '../context/ThemeContext';
 import '../styles/LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
@@ -9,7 +8,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const { darkMode } = useContext(ThemeContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +44,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
+    <div className="login-container">
       <div className="login-left">
         <div className="brand-content">
           <div className="logo-circle"></div>
@@ -64,7 +62,7 @@ const LoginPage = () => {
           <h2>Iniciar Sesión</h2>
           
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="email">Correo electrónico</label>
               <input
                 type="email"
@@ -76,7 +74,7 @@ const LoginPage = () => {
               />
             </div>
             
-            <div className="form-group">
+            <div className="form-group-lo">
               <label htmlFor="password">Contraseña</label>
               <div className="password-input-container">
                 <input

@@ -60,9 +60,18 @@ def register_software_risk(data):
         if evaluation:
             likelihood_name = evaluation["likelihood"]
             impact_name = evaluation["impact"]
-            likelihood = LikelihoodEnum[likelihood_name].value 
-            impact = ImpactEnum[impact_name].value 
-            valor_riesgo = likelihood * impact
+            
+            # Obtener valores numéricos de los enums
+            try:
+                likelihood_enum = LikelihoodEnum[likelihood_name]
+                impact_enum = ImpactEnum[impact_name]
+                likelihood_value = likelihood_enum.value 
+                impact_value = impact_enum.value 
+            except KeyError as e:
+                print(f"Error con enum: {e}")
+                return {"error": f"Valor de enum inválido: {e}"}, 400
+            
+            valor_riesgo = likelihood_value * impact_value
 
             # Determinar zona de riesgo
             if valor_riesgo <= 3:
@@ -78,10 +87,11 @@ def register_software_risk(data):
                 risk_zone = "EXTREMA"
                 acceptance = "No"
 
+            # IMPORTANTE: Guardar el enum completo, no solo el nombre
             risk_eval = RiskEvaluation(
                 risk_id=risk.id,
-                likelihood=likelihood_name,
-                impact=impact_name,
+                likelihood=likelihood_enum,  # Guardar el enum completo
+                impact=impact_enum,          # Guardar el enum completo
                 risk_zone=risk_zone,
                 acceptance=acceptance
             )

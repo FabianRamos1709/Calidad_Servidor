@@ -19,7 +19,7 @@ def create_app():
     with app.app_context():
         db.create_all() 
     #Migrate(app, db)  
-    CORS(app, origins="http://localhost:5173", supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
     app.register_blueprint(riesgo_routes, url_prefix='/riesgo')
     return app
 
