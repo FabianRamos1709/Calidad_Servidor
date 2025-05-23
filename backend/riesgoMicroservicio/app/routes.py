@@ -116,55 +116,60 @@ def listar_evaluaciones_riesgo(user_id):
     
 
 @riesgo_routes.route('/detalle/<int:risk_id>', methods=['GET'])
-def obtener_detalle_riesgo(risk_id):
+def detalle_riesgo(risk_id):
     try:
-        from backend.models import SoftwareRisk, db
+        risk = SoftwareRisk.query.get_or_404(risk_id)
+        software = Software.query.get_or_404(risk.software_id)
 
-        riesgo = SoftwareRisk.query.get(risk_id)
-
-        if not riesgo:
-            return jsonify({"error": "Riesgo no encontrado"}), 404
-
-        data = {
-            "risk_id": riesgo.id,
-            "software_id": riesgo.software_id,
-            "risk_code": riesgo.risk_code,
-            "title": riesgo.title,
-            "description": riesgo.description,
-            "causes": riesgo.causes,
-            "process": riesgo.process,
-            "identified_at": riesgo.identified_at.strftime('%Y-%m-%d'),
-            "affects_critical_infrastructure": riesgo.affects_critical_infrastructure,
-            "owner": {
-                "name": riesgo.ownership.owner_name if riesgo.ownership else "N/A",
-                "role": riesgo.ownership.owner_role if riesgo.ownership else "N/A"
+        response = {
+            "software": {
+                "id": software.id,
+                "name": software.name,
+                "version": software.version,
+            },
+            "risk": {
+                "id": risk.id,
+                "risk_code": risk.risk_code,
+                "title": risk.title,
+                "identified_at": risk.identified_at.strftime("%Y-%m-%d"),
+                "description": risk.description,
+                "causes": risk.causes,
+                "affects_critical_infrastructure": risk.affects_critical_infrastructure,
+                "process": risk.process
             },
             "classification": {
-                "risk_type": str(riesgo.classification.risk_type.value) if riesgo.classification else "N/A",
-                "confidentiality": riesgo.classification.confidentiality if riesgo.classification else False,
-                "integrity": riesgo.classification.integrity if riesgo.classification else False,
-                "availability": riesgo.classification.availability if riesgo.classification else False,
-                "impact_type": riesgo.classification.impact_type if riesgo.classification else "N/A"
-            },
+                "risk_type": risk.classification.risk_type.value if risk.classification else None,
+                "confidentiality": risk.classification.confidentiality,
+                "integrity": risk.classification.integrity,
+                "availability": risk.classification.availability,
+                "impact_type": risk.classification.impact_type
+            } if risk.classification else {},
             "evaluation": {
-                "likelihood": str(riesgo.evaluation.likelihood.name) if riesgo.evaluation else "N/A",
-                "impact": str(riesgo.evaluation.impact.name) if riesgo.evaluation else "N/A",
-                "risk_zone": riesgo.evaluation.risk_zone if riesgo.evaluation else "N/A",
-                "acceptance": riesgo.evaluation.acceptance if riesgo.evaluation else "N/A"
-            },
+                "likelihood": risk.evaluation.likelihood.name,
+                "impact": risk.evaluation.impact.name,
+                "risk_zone": risk.evaluation.risk_zone,
+                "acceptance": risk.evaluation.acceptance,
+                "valor_riesgo": LikelihoodEnum[risk.evaluation.likelihood.name].value * ImpactEnum[risk.evaluation.impact.name].value
+            } if risk.evaluation else {},
             "controls": {
-                "control_type": riesgo.controls.control_type if riesgo.controls else "N/A",
-                "rating": str(riesgo.controls.control_rating) if riesgo.controls else "0",
-                "has_mechanism": riesgo.controls.has_mechanism if riesgo.controls else False,
-                "has_manuals": riesgo.controls.has_manuals if riesgo.controls else False,
-                "control_effective": riesgo.controls.control_effective if riesgo.controls else False,
-                "responsible_defined": riesgo.controls.responsible_defined if riesgo.controls else False,
-                "control_frequency_adequate": riesgo.controls.control_frequency_adequate if riesgo.controls else False
+                "control_type": risk.controls.control_type,
+                "has_mechanism": risk.controls.has_mechanism,
+                "has_manuals": risk.controls.has_manuals,
+                "control_effective": risk.controls.control_effective,
+                "responsible_defined": risk.controls.responsible_defined,
+                "control_frequency_adequate": risk.controls.control_frequency_adequate,
+                "control_rating": float(risk.controls.control_rating),
+                "reduce_likelihood_quadrants": risk.controls.reduce_likelihood_quadrants,
+                "reduce_impact_quadrants": risk.controls.reduce_impact_quadrants,
+            } if risk.controls else {},
+            "mitigation": {
+                "responsible": risk.mitigations[0].responsible if risk.mitigations else "No asignado",
+                "risk_zone": risk.mitigations[0].risk_zone if risk.mitigations else None
             }
         }
 
-        return jsonify(data), 200
+        return jsonify(response), 200
 
     except Exception as e:
-        print("Error al obtener detalle de riesgo:", str(e))
-        return jsonify({"error": str(e)}), 500
+        print("Error en detalle_riesgo:", str(e))
+        return jsonify({"error": "Error al obtener detalle del riesgo"}), 500

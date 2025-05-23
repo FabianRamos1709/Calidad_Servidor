@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/DetallesRiesgoPage.css";
+import MatrizRiesgo from "../components/MatrizRiesgo";
 
 export default function DetalleRiesgoPage() {
   const { softwareId, riskId } = useParams();
@@ -55,21 +56,28 @@ export default function DetalleRiesgoPage() {
   if (!data || !software) return <div className="error-message">No hay datos disponibles</div>;
 
   return (
+    
     <div className="riesgo-detalle-container">
-      <h1>Resultado Evaluación de Riesgo</h1>
-      <h2>{software.name} - v{software.version}</h2>
+    <h1>Resultado Evaluación de Riesgo</h1>
+    <h2>{software.name} - v{software.version}</h2>
 
-      <div className="riesgo-resumen">
-        <h3>{data.title}</h3>
-        <p><strong>Código:</strong> {data.risk_code}</p>
-        <p><strong>Fecha Identificación:</strong> {data.identified_at}</p>
-        <p><strong>Zona de Riesgo:</strong> {data.evaluation.risk_zone}</p>
-        <p><strong>¿Aceptado?:</strong> {data.evaluation.acceptance}</p>
-        <p><strong>Descripción:</strong> {data.description}</p>
-        <p><strong>Causas:</strong> {data.causes}</p>
-        <p><strong>Proceso:</strong> {data.process}</p>
-        <p><strong>Infraestructura Crítica:</strong> {data.affects_critical_infrastructure ? "Sí" : "No"}</p>
-      </div>
+    {/* Mostrar la matriz visual del riesgo */}
+    <MatrizRiesgo 
+      likelihood={data.evaluation.likelihood} 
+      impact={data.evaluation.impact} 
+    />
+
+    <div className="riesgo-resumen">
+      <h3>{data.title}</h3>
+      <p><strong>Código:</strong> {data.risk_code}</p>
+      <p><strong>Fecha Identificación:</strong> {data.identified_at}</p>
+      <p><strong>Zona de Riesgo:</strong> {data.evaluation.risk_zone}</p>
+      <p><strong>¿Aceptado?:</strong> {data.evaluation.acceptance}</p>
+      <p><strong>Descripción:</strong> {data.description}</p>
+      <p><strong>Causas:</strong> {data.causes}</p>
+      <p><strong>Proceso:</strong> {data.process}</p>
+      <p><strong>Infraestructura Crítica:</strong> {data.affects_critical_infrastructure ? "Sí" : "No"}</p>
+    </div>
 
       <div className="riesgo-clasificacion">
         <h3>Clasificación</h3>
@@ -96,7 +104,10 @@ export default function DetalleRiesgoPage() {
         <p><strong>Efectivo:</strong> {data.controls.control_effective ? "✔" : "✘"}</p>
         <p><strong>Responsable Definido:</strong> {data.controls.responsible_defined ? "✔" : "✘"}</p>
         <p><strong>Frecuencia Adecuada:</strong> {data.controls.control_frequency_adequate ? "✔" : "✘"}</p>
+        <p><strong>Valor del Riesgo:</strong> {data.evaluation.valor_riesgo}</p>
         <p><strong>Puntaje Total:</strong> {data.controls.control_rating}</p>
+        <p><strong>Cuadrante Probabilidad:</strong> {data.controls.reduce_likelihood_quadrants}</p>
+        <p><strong>Cuadrante Impacto:</strong> {data.controls.reduce_impact_quadrants}</p>
       </div>
 
       <div className="resultados-actions">
