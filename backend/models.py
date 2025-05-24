@@ -277,6 +277,7 @@ class RiskMitigation(db.Model):
     phase = db.Column(db.String(100))
     response_type = db.Column(Enum(ResponseTypeEnum))
     mitigation_plan = db.Column(db.Text)
+    registered_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     risk = db.relationship('SoftwareRisk', backref=db.backref('mitigations', cascade='all, delete-orphan'))
     evaluation = db.relationship('RiskEvaluation', backref='mitigation')
