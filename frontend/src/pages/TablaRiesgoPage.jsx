@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ResultadosTabla.css';
 
-export default function ResultadosTabla() {
+export default function TablaRiesgosPage() {
   const navigate = useNavigate();
   const [datos, setDatos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ export default function ResultadosTabla() {
         setLoading(true);
         setError(null);
         
-        const url = `http://localhost:5003/evaluacion/software-evaluados/${userId}`;
+        const url = `http://localhost:5004/riesgo/evaluaciones/${userId}`;
         console.log(`Fetching from: ${url}`); // Para debugging
 
         const response = await fetch(url, {
@@ -56,17 +56,19 @@ export default function ResultadosTabla() {
         const formateado = data.map(item => ({
           codigo: item.software_id,
           nombreSoftware: item.software_name,
+          codigoRiesgo: item.risk_code,
           fechaEvaluacion: item.evaluation_date,
-          porcentajeGlobal: item.global_percentage,
-          resultado: item.result,
-          evaluationId: item.evaluation_id
+          valorRiesgo: item.valor_riesgo || 'N/A',
+          zonaRiesgo: item.zona_riesgo,
+          aceptacion: item.acceptance,
+          riskId: item.risk_id
         }));
 
         setDatos(formateado);
         setError(null);
       } catch (err) {
         console.error("Error al obtener los datos:", err);
-        setError(`No se pudieron cargar los resultados de calidad: ${err.message}`);
+        setError(`No se pudieron cargar los resultados de riesgo: ${err.message}`);
         setDatos([]);
       } finally {
         setLoading(false);
@@ -77,26 +79,34 @@ export default function ResultadosTabla() {
   }, [userId]);
 
   const handleVerDetalle = (item) => {
-    navigate(`/resultados/${item.codigo}/${item.evaluationId}`);
+    navigate(`/riesgos/detalle/${item.codigo}/${item.riskId}`);
   };
 
-  const getResultadoColor = (resultado) => {
-    switch (resultado) {
-      case 'Excelente': return '#4caf50';
-      case 'Sobresaliente': return '#8bc34a';
-      case 'Aceptable': return '#ffeb3b';
-      case 'Insuficiente': return '#ff9800';
-      case 'Deficiente': return '#f44336';
+  const handleGestionarMitigacion = (item) => {
+    // Navegar a la página de gestión de mitigación
+    navigate(`/riesgos/mitigacion/${item.codigo}`);
+  };
+
+  const getZonaRiesgoColor = (zona) => {
+    switch (zona?.toUpperCase()) {
+      case 'BAJA': return '#4caf50';
+      case 'MODERADA': return '#ff9800';
+      case 'ALTA': return '#f44336';
+      case 'EXTREMA': return '#9c27b0';
       default: return '#757575';
     }
   };
 
+  const getAceptacionColor = (aceptacion) => {
+    return aceptacion === 'Si' ? '#4caf50' : '#f44336';
+  };
+
   return (
     <div className="container">
-      <h1 className="titulo">Resultados de Evaluación de Calidad</h1>
+      <h1 className="titulo">Evaluaciones de Riesgo</h1>
 
       {loading ? (
-        <p>Cargando evaluaciones de calidad...</p>
+        <p>Cargando evaluaciones de riesgo...</p>
       ) : error ? (
         <div className="error-mensaje">
           <p>{error}</p>
@@ -109,31 +119,44 @@ export default function ResultadosTabla() {
               <tr>
                 <th>ID SOFTWARE</th>
                 <th>Nombre del Software</th>
+                <th>Código de Riesgo</th>
                 <th>Fecha de Evaluación</th>
-                <th>Porcentaje Global</th>
-                <th>Resultado</th>
+                <th>Valor de Riesgo</th>
+                <th>Zona de Riesgo</th>
+                <th>Aceptación</th>
                 <th>ACCIONES</th>
               </tr>
             </thead>
             <tbody>
               {datos.map((item, index) => (
-                <tr key={`${item.codigo}-${item.evaluationId}-${index}`}>
+                <tr key={`${item.codigo}-${item.riskId}-${index}`}>
                   <td>{item.codigo}</td>
                   <td>{item.nombreSoftware}</td>
+                  <td>{item.codigoRiesgo}</td>
                   <td>{item.fechaEvaluacion}</td>
-                  <td>{item.porcentajeGlobal}</td>
+                  <td>{item.valorRiesgo}</td>
                   <td>
                     <span 
-                      className="resultado-badge"
+                      className="zona-riesgo-badge"
                       style={{ 
-                        backgroundColor: getResultadoColor(item.resultado),
-                        color: item.resultado === 'Aceptable' ? '#333' : 'white',
+                        backgroundColor: getZonaRiesgoColor(item.zonaRiesgo),
+                        color: 'white',
                         padding: '4px 8px',
                         borderRadius: '4px',
                         fontSize: '12px'
                       }}
                     >
-                      {item.resultado}
+                      {item.zonaRiesgo}
+                    </span>
+                  </td>
+                  <td>
+                    <span 
+                      style={{ 
+                        color: getAceptacionColor(item.aceptacion),
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {item.aceptacion}
                     </span>
                   </td>
                   <td className="acciones">
@@ -144,19 +167,26 @@ export default function ResultadosTabla() {
                     >
                       🔍
                     </button>
+                    <button
+                      onClick={() => handleGestionarMitigacion(item)}
+                      className="boton-accion boton-mitigacion"
+                      title="Gestionar mitigación"
+                    >
+                      ⚙️
+                    </button>
                   </td>
                 </tr>
               ))}
               {datos.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="no-datos">
-                    No hay evaluaciones de calidad disponibles
+                  <td colSpan="8" className="no-datos">
+                    No hay evaluaciones de riesgo disponibles
                   </td>
                 </tr>
               )}
               {datos.length > 0 && Array(Math.max(0, 8 - datos.length)).fill().map((_, index) => (
                 <tr key={`empty-${index}`} className="fila-vacia">
-                  <td colSpan="6"></td>
+                  <td colSpan="8"></td>
                 </tr>
               ))}
             </tbody>

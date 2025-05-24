@@ -1,13 +1,21 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import '../styles/LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Si ya está autenticado, redirigir al home
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,6 +27,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch("http://localhost:5001/auth/login", {
@@ -30,17 +39,18 @@ const LoginPage = () => {
       const result = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', result.token);
-        login(result.user); // Guardar datos del usuario
-        navigate("/home");
-      }else {
-        alert("Credenciales invalidas")
+        // Pasar tanto el usuario como el token al contexto
+        login(result.user, result.token);
+        navigate("/home", { replace: true });
+      } else {
+        alert(result.message || "Credenciales inválidas");
       }
     } catch (error) {
       console.error("Error de conexión:", error);
       alert("Error de conexión con el servidor");
+    } finally {
+      setIsLoading(false);
     }
-
   };
 
   return (
@@ -50,9 +60,8 @@ const LoginPage = () => {
           <div className="logo-circle"></div>
           <h1>Design with us</h1>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-            lobortis maximus nunc, ac rhoncus odio congue quis. Sed ac semper orci, eu
-            porttitor lacus.
+            Sistema de gestión de software seguro. Inicia sesión para acceder
+            a todas las funcionalidades de evaluación y gestión de riesgos.
           </p>
         </div>
       </div>
@@ -71,6 +80,7 @@ const LoginPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -84,11 +94,13 @@ const LoginPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
                 <button 
                   type="button" 
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
@@ -96,8 +108,12 @@ const LoginPage = () => {
               <a href="#" className="forgot-password">¿Olvidaste tu Contraseña?</a>
             </div>
             
-            <button type="submit" className="login-button">
-              Iniciar Sesión
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
           

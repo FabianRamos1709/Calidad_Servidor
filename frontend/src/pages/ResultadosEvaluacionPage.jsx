@@ -12,23 +12,27 @@ export default function ResultadosEvaluacionPage() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        // Fetch software details
-        const softwareResponse = await fetch(`http://localhost:5000/software/${softwareId}`, {
+        const token = localStorage.getItem("token");
+        
+        // Decodificar el token para obtener el user_id
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        const userId = tokenPayload.sub; // o tokenPayload.user_id, dependiendo de cómo esté estructurado tu JWT
+
+        // 1. Obtener el software por ID usando el endpoint correcto
+        const softwareRes = await fetch(`http://localhost:5000/software/${userId}/${softwareId}`, {
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${token}`
           }
         });
 
-        if (!softwareResponse.ok) {
-          throw new Error('Error al cargar detalles del software');
-        }
-        const softwareData = await softwareResponse.json();
-        setSoftware(softwareData);
+        if (!softwareRes.ok) throw new Error("Error al obtener software");
+        const softwareResponse = await softwareRes.json();
+        setSoftware(softwareResponse.software); // Nota: la respuesta viene en { software: {...} }
 
-        // Cambiado de 127.0.0.1 a localhost para ser consistente
+        // 2. Obtener resultados de evaluación
         const resultsResponse = await fetch(`http://localhost:5003/evaluacion/resultados/${softwareId}/${evaluationId}`, {
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            "Authorization": `Bearer ${token}`
           }
         });
         

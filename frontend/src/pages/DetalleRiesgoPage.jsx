@@ -27,7 +27,7 @@ export default function DetalleRiesgoPage() {
         if (!softwareRes.ok) throw new Error("Error al obtener software");
 
         const softwareData = await softwareRes.json();
-        setSoftware(softwareData);
+        setSoftware(softwareData.software);
 
         // Cargar detalle del riesgo
         const response = await fetch(`http://localhost:5004/riesgo/detalle/${riskId}`, {
@@ -67,17 +67,17 @@ export default function DetalleRiesgoPage() {
       impact={data.evaluation.impact} 
     />
 
-    <div className="riesgo-resumen">
-      <h3>{data.title}</h3>
-      <p><strong>Código:</strong> {data.risk_code}</p>
-      <p><strong>Fecha Identificación:</strong> {data.identified_at}</p>
-      <p><strong>Zona de Riesgo:</strong> {data.evaluation.risk_zone}</p>
-      <p><strong>¿Aceptado?:</strong> {data.evaluation.acceptance}</p>
-      <p><strong>Descripción:</strong> {data.description}</p>
-      <p><strong>Causas:</strong> {data.causes}</p>
-      <p><strong>Proceso:</strong> {data.process}</p>
-      <p><strong>Infraestructura Crítica:</strong> {data.affects_critical_infrastructure ? "Sí" : "No"}</p>
-    </div>
+      <div className="riesgo-resumen">
+        <h3>{data.risk?.title}</h3>
+        <p><strong>Código:</strong> {data.risk?.risk_code}</p>
+        <p><strong>Fecha Identificación:</strong> {data.risk?.identified_at}</p>
+        <p><strong>Zona de Riesgo:</strong> {data.evaluation.risk_zone}</p>
+        <p><strong>¿Aceptado?:</strong> {data.evaluation.acceptance}</p>
+        <p><strong>Descripción:</strong> {data.risk?.description}</p>
+        <p><strong>Causas:</strong> {data.risk?.causes}</p>
+        <p><strong>Proceso:</strong> {data.risk?.process}</p>
+        <p><strong>Infraestructura Crítica:</strong> {data.risk?.affects_critical_infrastructure ? "Sí" : "No"}</p>
+      </div>
 
       <div className="riesgo-clasificacion">
         <h3>Clasificación</h3>

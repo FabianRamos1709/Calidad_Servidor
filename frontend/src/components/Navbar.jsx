@@ -65,8 +65,9 @@ export default function Navbar() {
             <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`}>Dashboard</Link>
             <Link to="/sobrenosotros" className={`nav-link ${isActive('/sobrenosotros')}`}>Sobre Nosotros</Link>
             <Link to="/contactenos" className={`nav-link ${isActive('/contactenos')}`}>Contáctenos</Link>
-            <Link to="/software" className={`nav-link ${isActive('/software')}`}>Evolución</Link>
+            <Link to="/software" className={`nav-link ${isActive('/software')}`}>Evaluación</Link>
             <Link to="/resultados" className={`nav-link ${isActive('/resultados')}`}>Resultados</Link>
+            <Link to="/riesgos" className={`nav-link ${isActive('/riesgos')}`}>Plan Mitigacion</Link>
           </div>
           
           <div className="auth-buttons">
