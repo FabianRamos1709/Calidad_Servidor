@@ -289,8 +289,8 @@ def obtener_detalle_riesgo(risk_id):
         print("Error en obtener_detalle_riesgo:", str(e))
         return jsonify({"error": "Error al obtener detalle del riesgo"}), 500
     
-def get_mitigations_by_software_id(software_id):
-    mitigations = db.session.query(RiskMitigation).join(RiskMitigation.risk).filter(SoftwareRisk.software_id == software_id).all()
+def get_mitigation_by_risk_id(risk_id):
+    mitigations = RiskMitigation.query.filter_by(risk_id=risk_id).all()
 
     def serialize_mitigation(m):
         return {

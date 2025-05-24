@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services import register_software_risk, obtener_detalle_riesgo, obtener_evaluaciones_riesgo, get_mitigations_by_software_id, update_risk_mitigation
+from app.services import register_software_risk, obtener_detalle_riesgo, obtener_evaluaciones_riesgo, get_mitigation_by_risk_id, update_risk_mitigation
 
 
 riesgo_routes = Blueprint('risk', __name__)
@@ -18,11 +18,12 @@ def listar_evaluaciones_riesgo(user_id):
 def detalle_riesgo(risk_id):
     return obtener_detalle_riesgo(risk_id)
 
-@riesgo_routes.route('/mitigacion/<int:software_id>', methods=['GET'])
-def get_mitigations_for_software(software_id):
+
+@riesgo_routes.route('/mitigacion/<int:risk_id>', methods=['GET'])
+def get_mitigation(risk_id):
     try:
-        mitigations = get_mitigations_by_software_id(software_id)
-        return jsonify(mitigations), 200
+        mitigations = get_mitigation_by_risk_id(risk_id)
+        return jsonify({'mitigations': mitigations}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

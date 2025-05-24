@@ -206,7 +206,7 @@ const fetchSoftwareList = async () => {
             <th>Nombre del Software</th>
             <th>Versión</th>
             <th>Ciudad</th>
-            <th>Fecha de evaluacion</th>
+            <th>Fecha de registro</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -222,7 +222,7 @@ const fetchSoftwareList = async () => {
                 <td>{software.name}</td>
                 <td>{software.version}</td>
                 <td>{software.city}</td>
-                <td>{software.evaluation_date || "No evaluado"}</td>
+                <td>{software.registered_at || "No evaluado"}</td>
                 <td>
                   <button 
                     className="icon-button view" 

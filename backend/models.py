@@ -39,7 +39,8 @@ class Software(db.Model):
             'general_objective': self.general_objective,
             'description': self.description,
             'version': self.version,
-            'user_id': self.user_id
+            'user_id': self.user_id,
+            'registered_at': self.registered_at.strftime('%d-%m-%Y') if self.registered_at else None
         }
 class SoftwareParticipant(db.Model):
     __tablename__ = 'software_participants'
