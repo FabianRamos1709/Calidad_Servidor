@@ -1,7 +1,6 @@
 from backend.models import db, Software, SoftwareParticipant
 
 def create_software_with_participants(name, city, general_objective, description, version, participants, user_id):
-    # Verificar existencia incluyendo user_id
     existing_software = Software.query.filter_by(name=name, user_id=user_id).first()
     if existing_software:
         return {'success': False, 'message': 'Ya tienes un software con este nombre'}

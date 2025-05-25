@@ -21,7 +21,7 @@ def authenticate_user(email, password):
 
         return {
             "token": token,
-            "user": {  # Devolver datos del usuario
+            "user": {
                 "id": user.id,
                 "username": user.username,
                 "email": user.email

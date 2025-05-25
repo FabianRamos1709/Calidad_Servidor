@@ -20,5 +20,5 @@ def login():
     data = request.get_json()
     token_data = authenticate_user(data.get('email'), data.get('password'))
     if token_data:
-        return jsonify(token_data), 200  # Enviar token + datos de usuario
+        return jsonify(token_data), 200
     return jsonify({'message': 'Credenciales inválidas'}), 401

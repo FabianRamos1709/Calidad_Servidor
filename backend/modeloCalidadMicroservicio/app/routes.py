@@ -89,7 +89,6 @@ def delete_sub(id):
     return jsonify({'message': 'Eliminada exitosamente'}), 200
 
 
-#misma monda, para lo del software y los items
 """
 @modelo_routes.route('/asignar_item', methods=['POST'])
 def asignar_item_a_software():

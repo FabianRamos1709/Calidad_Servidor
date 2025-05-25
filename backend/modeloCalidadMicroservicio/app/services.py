@@ -123,8 +123,6 @@ def delete_subcharacteristic(sub_id):
     return True
 
 
-#para asignar vincular los items y subcaracteristicas a un software
-
 """def assign_characteristics_to_software(software_id, characteristic_ids):
     from backend.models import Software, QualityCharacteristic
 

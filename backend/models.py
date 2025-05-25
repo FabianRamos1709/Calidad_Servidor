@@ -72,7 +72,7 @@ class EvaluationCharacteristicSummary(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='SET NULL'))  # SET NULL por seguridad
+    characteristic_id = db.Column(db.Integer, db.ForeignKey('quality_characteristics.id', ondelete='SET NULL'))  
 
     value = db.Column(db.Integer, nullable=False)
     max_value = db.Column(db.Integer, nullable=False)
@@ -88,7 +88,7 @@ class EvaluationDetail(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     evaluation_id = db.Column(db.Integer, db.ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=False)
-    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='SET NULL'))  # Cambia a SET NULL por seguridad
+    subcharacteristic_id = db.Column(db.Integer, db.ForeignKey('subcharacteristics.id', ondelete='SET NULL'))
     score = db.Column(db.SmallInteger, nullable=False)
     comment = db.Column(db.Text, nullable=True)
 

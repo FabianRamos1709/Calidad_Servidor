@@ -20,7 +20,6 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all() 
-    #Migrate(app, db)  
 
     CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 

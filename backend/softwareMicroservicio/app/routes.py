@@ -19,7 +19,7 @@ def register():
     description = data.get('description')
     version = data.get('version')
     user_id=user_id
-    participants = data.get('participants', [])  # lista de diccionarios
+    participants = data.get('participants', [])
 
     result = create_software_with_participants(name, city, general_objective, description, version, participants, user_id)
     if result['success']:
@@ -30,9 +30,8 @@ def register():
 @jwt_required()
 def get_user_software(user_id):
     current_user_id = get_jwt_identity()
-    
-    # Solo permitir que un usuario vea su propia información
-    if user_id != int(current_user_id): #convertir en int
+
+    if user_id != int(current_user_id): 
         return jsonify({"error": "No autorizado"}), 403
 
     software_list = Software.query.filter_by(user_id=user_id).all()

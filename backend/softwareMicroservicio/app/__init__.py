@@ -6,7 +6,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Register routes
     app.register_blueprint(software_routes, url_prefix='/software')
 
     return app

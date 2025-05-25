@@ -14,12 +14,10 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Inicializar extensiones
     db.init_app(app)
     JWTManager(app)
     with app.app_context():
         db.create_all() 
-    #Migrate(app, db)  # ⬅️ Esta línea es nueva
     CORS(app, origins="http://localhost:5173", supports_credentials=True)
 
     app.register_blueprint(auth_routes, url_prefix='/auth')

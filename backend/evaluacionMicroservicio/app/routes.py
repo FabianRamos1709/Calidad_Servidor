@@ -4,14 +4,12 @@ from app.services import create_evaluation, get_evaluation_details_by_software_i
 
 evaluation_routes = Blueprint('evaluation_routes', __name__)
 
-# Aplicar CORS específicamente al blueprint
 CORS(evaluation_routes,
      origins=["http://localhost:5173", "http://127.0.0.1:5173"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization"],
      supports_credentials=True)
 
-# Manejador para la solicitud preflight OPTIONS
 @evaluation_routes.route('/evaluar', methods=['OPTIONS'])
 def options_evaluar():
     response = jsonify({"status": "ok"})
@@ -60,7 +58,6 @@ def get_evaluated_softwares(user_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-# Corrige también la URL - asegúrate que coincida con la utilizada en el frontend
 @evaluation_routes.route('/resultados/<int:software_id>/<int:evaluation_id>', methods=['GET', 'OPTIONS'])
 def get_software_characteristic_summary(software_id, evaluation_id):
     if request.method == 'OPTIONS':

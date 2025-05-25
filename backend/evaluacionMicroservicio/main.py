@@ -16,7 +16,6 @@ def create_app():
 
     app.config['CORS_HEADERS'] = 'Content-Type,Authorization'
     
-    # Aplicar CORS antes de registrar rutas
     CORS(app, 
          resources={r"/*": {
             "origins": ["http://localhost:5173"],

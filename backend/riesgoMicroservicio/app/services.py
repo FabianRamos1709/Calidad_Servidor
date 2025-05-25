@@ -6,7 +6,6 @@ from backend.models import (
 
 def register_software_risk(data):
     try:
-        # Crear riesgo principal
         risk = SoftwareRisk(
             software_id=data["software_id"],
             risk_code=data["risk_code"],
@@ -18,9 +17,8 @@ def register_software_risk(data):
             process=data.get("process", "")
         )
         db.session.add(risk)
-        db.session.flush()  # Para obtener risk.id
+        db.session.flush()
 
-        # Crear propiedad del riesgo
         ownership = data.get("ownership")
         if ownership:
             risk_owner = RiskOwnership(
@@ -31,12 +29,10 @@ def register_software_risk(data):
             db.session.add(risk_owner)
             db.session.flush()
 
-        # Clasificación del riesgo
         classification = data.get("classification")
         if classification:
             risk_type = classification["risk_type"]
 
-            # Determinar tipo de impacto según tipo de riesgo
             if risk_type in ["Fisico", "Logico", "Locativo"]:
                 impact_type = "Continuidad Operativa"
             elif risk_type == "Legal":
@@ -56,13 +52,11 @@ def register_software_risk(data):
             )
             db.session.add(risk_class)
 
-        # Evaluación del riesgo
         evaluation = data.get("evaluation")
         if evaluation:
             likelihood_name = evaluation["likelihood"]
             impact_name = evaluation["impact"]
-            
-            # Obtener valores numéricos de los enums
+
             try:
                 likelihood_enum = LikelihoodEnum[likelihood_name]
                 impact_enum = ImpactEnum[impact_name]
@@ -74,7 +68,6 @@ def register_software_risk(data):
             
             valor_riesgo = likelihood_value * impact_value
 
-            # Determinar zona de riesgo
             if valor_riesgo <= 3:
                 risk_zone = "BAJA"
                 acceptance = "Si"
@@ -88,18 +81,16 @@ def register_software_risk(data):
                 risk_zone = "EXTREMA"
                 acceptance = "No"
 
-            # IMPORTANTE: Guardar el enum completo, no solo el nombre
             risk_eval = RiskEvaluation(
                 risk_id=risk.id,
-                likelihood=likelihood_enum,  # Guardar el enum completo
-                impact=impact_enum,          # Guardar el enum completo
+                likelihood=likelihood_enum,  
+                impact=impact_enum,          
                 risk_zone=risk_zone,
                 acceptance=acceptance
             )
             db.session.add(risk_eval)
             db.session.flush()
 
-        # Controles del riesgo
         controls = data.get("controls")
         if controls:
             control_type = controls["control_type"]
@@ -107,7 +98,6 @@ def register_software_risk(data):
             def puntaje(valor, peso):
                 return peso if valor == True else 0
 
-            # Calcular calificación total
             control_rating = (
                 puntaje(controls["has_mechanism"], 15) +
                 puntaje(controls["has_manuals"], 15) +
@@ -116,11 +106,9 @@ def register_software_risk(data):
                 puntaje(controls["control_frequency_adequate"], 25)
             )
 
-            # Determinar promedios según tipo
             preventive_controls_avg = control_rating if control_type == "PREVENTIVO" else 0
             corrective_controls_avg = control_rating if control_type == "CORRECTIVO" else 0
 
-            # Función para cuadrantes
             def cuadrante(valor):
                 if valor <= 50:
                     return 0
@@ -198,7 +186,6 @@ def obtener_evaluaciones_riesgo(user_id):
                 else:
                     likelihood_value = int(evaluation.likelihood)
 
-            # Procesar impact
             if evaluation.impact:
                 if hasattr(evaluation.impact, 'value'):
                     impact_value = evaluation.impact.value
