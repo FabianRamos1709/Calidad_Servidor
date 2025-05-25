@@ -43,7 +43,7 @@ function App() {
           <Route path="/riesgos" element={<ProtectedRoute><MainLayout><TablaRiesgosPage /></MainLayout></ProtectedRoute>} />
           <Route path="/riesgos/registrar/:softwareId" element={<ProtectedRoute><MainLayout><RegistroRiesgoPage /></MainLayout></ProtectedRoute>} />
           <Route path="/riesgos/detalle/:softwareId/:riskId" element={<ProtectedRoute><MainLayout><DetalleRiesgoPage /></MainLayout></ProtectedRoute>} />
-          <Route path="/riesgos/mitigacion/:softwareId" element={<ProtectedRoute><MainLayout><GestionMitigacionPage /></MainLayout></ProtectedRoute>} />
+          <Route path="/riesgos/mitigacion/:riskId" element={<ProtectedRoute><MainLayout><GestionMitigacionPage /></MainLayout></ProtectedRoute>} />
 
 
           {/* Redirección y 404 */}

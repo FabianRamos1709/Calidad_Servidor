@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ResultadosTabla.css';
-
+import { Eye } from "lucide-react";
 export default function ResultadosTabla() {
   const navigate = useNavigate();
   const [datos, setDatos] = useState([]);
@@ -142,7 +142,8 @@ export default function ResultadosTabla() {
                       className="boton-accion boton-detalle"
                       title="Ver detalle"
                     >
-                      🔍
+                      <Eye size={16} />
+                      Ver Detalle
                     </button>
                   </td>
                 </tr>

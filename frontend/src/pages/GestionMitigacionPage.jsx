@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../styles/GestionMitigacionPage.css";
 
 export default function GestionMitigacionPage() {
-  const { softwareId } = useParams();
   const navigate = useNavigate();
+  const { riskId } = useParams();
 
   const [mitigaciones, setMitigaciones] = useState([]);
   const [software, setSoftware] = useState(null);
@@ -21,47 +21,66 @@ export default function GestionMitigacionPage() {
   const tiposRespuesta = ['ACEPTAR', 'MITIGAR', 'TRANSFERIR', 'EVITAR'];
   const fases = ['ANÁLISIS', 'DISEÑO', 'DESARROLLO', 'PRUEBAS', 'IMPLEMENTACIÓN', 'MANTENIMIENTO'];
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      
-      // Decodificar el token para obtener el user_id
-      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-      const userId = tokenPayload.sub; // o tokenPayload.user_id, dependiendo de cómo esté estructurado tu JWT
-
-      // 1. Obtener el software por ID usando el endpoint correcto
-      const softwareRes = await fetch(`http://localhost:5000/software/${userId}/${softwareId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!softwareRes.ok) throw new Error("Error al obtener software");
-      const softwareResponse = await softwareRes.json();
-      setSoftware(softwareResponse.software); // Nota: la respuesta viene en { software: {...} }
-
-      // 2. Obtener mitigaciones
-      const mitigacionesRes = await fetch(`http://localhost:5004/riesgo/mitigacion/${softwareId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!mitigacionesRes.ok) throw new Error("Error al cargar mitigaciones");
-      const mitigacionesData = await mitigacionesRes.json();
-      setMitigaciones(mitigacionesData);
-
-    } catch (err) {
-      console.error(err);
-      setError(err.message || "Error al cargar datos");
-    } finally {
+  useEffect(() => {
+    // Verificar que riskId existe antes de hacer las peticiones
+    if (!riskId || riskId === 'undefined') {
+      setError("ID de riesgo no válido. Redirigiendo...");
+      setTimeout(() => navigate("/riesgos"), 2000);
       setLoading(false);
+      return;
     }
-  };
 
-  fetchData();
-}, [softwareId]);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+          setError("No se encontró token de autenticación");
+          setLoading(false);
+          return;
+        }
+
+        console.log("Cargando datos para riskId:", riskId); // Debug
+
+        // Obtener detalle del riesgo (incluye software y mitigación)
+        const detalleRes = await fetch(`http://localhost:5004/riesgo/detalle/${riskId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!detalleRes.ok) {
+          throw new Error(`Error al obtener detalle del riesgo: ${detalleRes.status}`);
+        }
+
+        const detalleData = await detalleRes.json();
+        setSoftware(detalleData.software);
+        
+        // Obtener mitigación del riesgo específico
+        const mitigacionesRes = await fetch(`http://localhost:5004/riesgo/mitigacion/${riskId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!mitigacionesRes.ok) {
+          throw new Error(`Error al cargar mitigaciones: ${mitigacionesRes.status}`);
+        }
+        
+        const mitigacionesData = await mitigacionesRes.json();
+        const mitigacionesArray = mitigacionesData.mitigations || [];
+        setMitigaciones(Array.isArray(mitigacionesArray) ? mitigacionesArray : [mitigacionesArray]);
+
+      } catch (err) {
+        console.error("Error en fetchData:", err);
+        setError(err.message || "Error al cargar datos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [riskId, navigate]);
 
   const handleEdit = (mitigacion) => {
     setEditingId(mitigacion.id);
@@ -119,6 +138,17 @@ useEffect(() => {
     }
   };
 
+  // Mostrar error si no hay riskId válido
+  if (!riskId || riskId === 'undefined') {
+    return (
+      <div className="gestion-mitigacion-container">
+        <div className="error-message">
+          ID de riesgo no válido. Redirigiendo a la lista de riesgos...
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <div className="loading">Cargando mitigaciones...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -153,7 +183,9 @@ useEffect(() => {
                       <label>Fase:</label>
                       <select value={formData.phase} onChange={(e) => setFormData({...formData, phase: e.target.value})}>
                         <option value="">Seleccionar fase</option>
-                        {fases.map(fase => <option key={fase} value={fase}>{fase}</option>)}
+                        {fases.map((fase) => (
+                          <option key={fase} value={fase}>{fase}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -161,7 +193,9 @@ useEffect(() => {
                       <label>Tipo de Respuesta:</label>
                       <select value={formData.response_type} onChange={(e) => setFormData({...formData, response_type: e.target.value})}>
                         <option value="">Seleccionar tipo</option>
-                        {tiposRespuesta.map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
+                        {tiposRespuesta.map((tipo) => (
+                          <option key={tipo} value={tipo}>{tipo}</option>
+                        ))}
                       </select>
                     </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ResultadosTabla.css';
+import { Eye, Settings  } from "lucide-react";
 
 export default function TablaRiesgosPage() {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ export default function TablaRiesgosPage() {
 
   const handleGestionarMitigacion = (item) => {
     // Navegar a la página de gestión de mitigación
-    navigate(`/riesgos/mitigacion/${item.codigo}`);
+    navigate(`/riesgos/mitigacion/${item.riskId}`);
   };
 
   const getZonaRiesgoColor = (zona) => {
@@ -165,14 +166,16 @@ export default function TablaRiesgosPage() {
                       className="boton-accion boton-detalle"
                       title="Ver detalle"
                     >
-                      🔍
+                      <Eye size={16} />
+                      Ver Detalle
                     </button>
                     <button
                       onClick={() => handleGestionarMitigacion(item)}
                       className="boton-accion boton-mitigacion"
                       title="Gestionar mitigación"
                     >
-                      ⚙️
+                      <Settings size={16} />
+                      Gestionar Mitigación
                     </button>
                   </td>
                 </tr>

@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Verificar token periódicamente (cada 30 segundos)
+  // Verificar token periódicamente (cada 60 segundos)
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -61,10 +61,9 @@ export const AuthProvider = ({ children }) => {
       if (!isTokenValid(token)) {
         console.log('Token expirado, cerrando sesión...');
         logout();
-        // Opcional: mostrar mensaje al usuario
         alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
       }
-    }, 30000); // 30 segundos
+    }, 60000); // 60 segundos
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);

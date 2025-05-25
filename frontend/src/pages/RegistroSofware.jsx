@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/RegistroSoftwarePage.css";
 import { useAuth } from '../context/authContext';
-
+import { Shield} from "lucide-react";
 export default function RegistroSoftwarePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -225,16 +225,10 @@ const fetchSoftwareList = async () => {
                 <td>{software.registered_at || "No evaluado"}</td>
                 <td>
                   <button 
-                    className="icon-button view" 
-                    onClick={() => handleViewDetails(software.id)}
-                  >
-                    Ver Detalles
-                  </button>
-                  <button className="icon-button edit">Editar</button>
-                  <button 
                     className="icon-button evaluate"
                     onClick={() => handleEvaluateSoftware(software.id)}
                   >
+                     <Shield size={16} />
                     Evaluar
                   </button>
                 </td>
